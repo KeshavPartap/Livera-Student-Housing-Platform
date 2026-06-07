@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LivEra — Explore Housing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<!-- Leaflet.js for interactive map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/js/data.js?v=1"></script>
+
+<script>
+  (function(){
+    const u=JSON.parse(localStorage.getItem('user')||'null');
+    if(!u||!u.role){window.location.href='login.html';}
+    else if(u.role==='lister'){window.location.href='dashboard.html';}
+  })();
+</script>
+
+<style>
+/* ── RESET & TOKENS ─────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a0f;--surface:#16161f;--surface-2:#1e1e2a;--surface-3:#2a2a35;
+  --border:rgba(255,255,255,0.06);--border-2:rgba(255,255,255,0.12);
+  --glass:rgba(16,16,25,.85);--gb:rgba(255,255,255,.06);
+  --accent:#c9a84c;--color-accent:#c9a84c;--color-accent-light:#e0c56e;--color-accent-dark:#a8882e;
+  --ad:rgba(201,168,76,.12);--ag:rgba(201,168,76,.28);
+  --red:#ef4444;--rb:rgba(239,68,68,.1);
+  --amber:#c9a84c;--ab:rgba(201,168,76,.1);
+  --green:#c9a84c;--gb2:rgba(201,168,76,.1);
+  --blue:#c9a84c;--bb:rgba(201,168,76,.12);
+  --t1:#eaeaf0;--t2:#8b8ba0;--t3:#5a5a72;
+  --color-bg:#0a0a0f;--color-text:#eaeaf0;--color-white:#ffffff;--color-surface:#16161f;
+  --r:14px;--rp:100px;
+  --panel:360px;--side:260px;
+  --ease:cubic-bezier(.25,.8,.25,1);
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* ── FLOATING SEARCH ───────────────────────────── */
+.search-wrap{position:fixed;top:16px;left:calc(var(--side) + (100% - var(--side))/2);transform:translateX(-50%);width:min(820px,94vw - var(--side));z-index:200;}
+.sbar{
+  display:flex;align-items:center;gap:0;height:60px;padding:0 6px;
+  background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--gb);border-radius:var(--r);
+  box-shadow:0 8px 32px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.05);
+  transition:border-color .3s,box-shadow .3s;
+}
+.sbar:focus-within{border-color:rgba(201,168,76,.4);box-shadow:0 12px 48px rgba(0,0,0,.3),0 0 0 2px var(--ag),inset 0 1px 0 rgba(255,255,255,.05);}
+.si{display:flex;align-items:center;gap:8px;padding:0 14px;position:relative;flex:1;}
+.si+.si::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);height:26px;width:1px;background:var(--border-2);}
+.sico{color:var(--accent);font-size:.82rem;min-width:14px;}
+.sinput{background:transparent;border:none;outline:none;color:var(--t1);font-family:'Inter',sans-serif;font-size:.85rem;font-weight:500;width:100%;}
+.sinput::placeholder{color:var(--t3);}
+.ssel{background:transparent;border:none;outline:none;color:var(--t1);font-family:'Inter',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;appearance:none;-webkit-appearance:none;min-width:80px;padding-right:14px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23484d66' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0 center;}
+.ssel option{background:var(--surface-2);color:var(--t1);}
+.sbtn{flex-shrink:0;background:var(--accent);border:none;border-radius:10px;color:var(--color-white);font-family:'Inter',sans-serif;font-size:.82rem;font-weight:700;padding:0 18px;height:46px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s var(--ease);white-space:nowrap;}
+.sbtn:hover{background:var(--color-accent-dark);transform:scale(1.02);}
+
+/* Search Dropdown */
+.sdrop{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border:1px solid var(--gb);border-radius:var(--r);padding:6px;box-shadow:0 16px 48px rgba(0,0,0,.1);display:none;animation:fdwn .2s var(--ease);z-index:300;}
+.sdrop.show{display:block;}
+@keyframes fdwn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.dlbl{font-size:.66rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;padding:7px 10px 3px;}
+.sug{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:background .15s;}
+.sug:hover{background:var(--surface-3);}
+.sugico{width:30px;height:30px;background:var(--surface-3);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.77rem;color:var(--accent);flex-shrink:0;}
+.sugmain{font-size:.85rem;font-weight:600;color:var(--t1);}
+.sugsub{font-size:.72rem;color:var(--t2);margin-top:1px;}
+.sugbadge{margin-left:auto;background:var(--ad);color:var(--accent);font-size:.66rem;font-weight:700;padding:2px 7px;border-radius:var(--rp);flex-shrink:0;}
+
+/* ── FILTER BAR (ADVANCED, BELOW SEARCH) ─────── */
+.filter-bar{
+  position:fixed;top:88px;left:calc(var(--side) + (100% - var(--side))/2);transform:translateX(-50%);
+  width:min(820px,94vw - var(--side));z-index:190;
+  display:flex;align-items:center;gap:6px;flex-wrap:nowrap;
+  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--gb);border-radius:10px;padding:7px 10px;
+  box-shadow:0 4px 16px rgba(0,0,0,.06);overflow-x:auto;
+  scrollbar-width:none;
+}
+.filter-bar::-webkit-scrollbar{display:none;}
+
+.fchip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 12px;border-radius:var(--rp);
+  font-size:.72rem;font-weight:600;cursor:pointer;white-space:nowrap;
+  border:1.5px solid var(--border-2);color:var(--t2);background:var(--surface-2);
+  transition:all .18s ease;flex-shrink:0;
+}
+.fchip:hover{border-color:var(--accent);color:var(--accent);}
+.fchip.on{background:var(--ad);color:var(--accent);border-color:rgba(201,168,76,.4);}
+.fchip i{font-size:.66rem;}
+
+.radius-select{
+  appearance:none;-webkit-appearance:none;background:var(--surface-2);border:1.5px solid var(--border-2);border-radius:var(--rp);color:var(--t2);font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;padding:5px 24px 5px 10px;cursor:pointer;flex-shrink:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='9' viewBox='0 0 24 24' fill='none' stroke='%23484d66' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 7px center;
+  transition:border-color .18s;
+}
+.radius-select:focus{outline:none;border-color:var(--accent);}
+.radius-select option{background:var(--surface-2);}
+
+/* ── APP LAYOUT ─────────────────────────────────── */
+.app-layout{display:flex;flex:1;overflow:hidden;padding-top:calc(60px + 50px + 16px + 16px);margin-left:var(--side);height:100vh;}
+
+/* ── FULL SIDEBAR ───────────────────────────────── */
+.sidebar{position:fixed;left:0;top:0;height:100vh;width:var(--side);z-index:1000;background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:24px 16px;box-shadow:4px 0 20px rgba(0,0,0,0.3);overflow-y:auto;transition:transform .3s var(--ease);}
+.sidebar::-webkit-scrollbar{display:none;}
+.sb-logo{display:flex;align-items:center;gap:12px;text-decoration:none;margin-bottom:28px;padding:0 8px;}
+.sb-logo-icon{width:38px;height:38px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--color-white);font-weight:800;box-shadow:0 4px 12px rgba(37,99,235,.25);flex-shrink:0;}
+.sb-logo-txt{font-size:1.35rem;font-weight:800;color:var(--color-white);white-space:nowrap;}
+.sb-logo-txt span{color:#eab308;}
+.sb-lbl{font-size:.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1.2px;padding:0 10px;margin-bottom:12px;margin-top:20px;}
+.sb-nav{display:flex;flex-direction:column;gap:6px;}
+.sb-btn{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:12px;color:#cbd5e1;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;text-decoration:none;transition:all .2s ease;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;}
+.sb-btn i{font-size:1.1rem;width:22px;text-align:center;flex-shrink:0;}
+.sb-btn span{white-space:nowrap;flex:1;}
+.sb-btn:hover{background:rgba(255,255,255,.08);color:var(--color-white);transform:translateX(4px);}
+.sb-btn.active{background:rgba(234,179,8,.15);color:#eab308;}
+.sb-spacer{flex:1;}
+.sb-dot{background:#ef4444;width:8px;height:8px;border-radius:50%;display:none;flex-shrink:0;box-shadow:0 0 0 2px var(--color-bg);}
+.sb-dot.show{display:block;}
+
+.mob-menu-btn{display:none;position:fixed;top:16px;left:16px;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:44px;height:44px;align-items:center;justify-content:center;cursor:pointer;font-size:1.2rem;color:var(--t1);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+
+/* RESPONSIVE LAYOUT */
+@media (max-width: 1024px) {
+  :root { --side: 84px; }
+  .sidebar { padding: 24px 10px; }
+  .sb-logo { justify-content: center; padding: 0; }
+  .sb-logo-txt, .sb-btn span, .sb-lbl { display: none; }
+  .sb-btn { justify-content: center; padding: 14px 0; }
+  .sb-btn i { width: auto; font-size: 1.35rem; }
+  .sb-dot{position:absolute;top:6px;right:6px;}
+  .sb-btn{position:relative;}
+}
+@media (max-width: 768px) {
+  :root { --side: 0px; }
+  .app-layout { margin-left: 0; flex-direction: column; padding-top: 140px; }
+  .list-panel { width: 100%; min-width: 100%; height: 50vh; }
+  .map-panel { height: 50vh; }
+  .search-wrap { left: calc(50% + 28px); width: calc(95vw - 56px); }
+  .filter-bar { left: 50%; width: 95vw; }
+  .sidebar { transform: translateX(-100%); width: 260px; padding: 24px 16px; }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .mob-menu-btn { display: flex; }
+  .sb-logo { justify-content: flex-start; padding: 0 8px; }
+  .sb-logo-txt, .sb-btn span, .sb-lbl { display: block; }
+  .sb-btn { justify-content: flex-start; padding: 12px 14px; }
+  .sb-btn i { width: 22px; font-size: 1.1rem; }
+  
+  /* Slide out panels for mobile */
+  .sp { left: 0; width: 100vw; }
+}
+
+/* ── LISTING PANEL ──────────────────────────────── */
+.list-panel{width:var(--panel);min-width:var(--panel);background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.ptop{padding:14px 14px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.pheader{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.pheader h2{font-size:.87rem;font-weight:700;color:var(--t1);}
+.pcnt{font-size:.75rem;color:var(--t2);}
+.tier-row{display:flex;gap:5px;}
+.tpill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--rp);font-size:.67rem;font-weight:700;border:1.5px solid;cursor:pointer;transition:all .18s ease;}
+.tpill i{font-size:.62rem;}
+.thi{background:var(--rb);color:var(--red);border-color:rgba(239,68,68,.35);}
+.tme{background:var(--ab);color:var(--amber);border-color:rgba(201,168,76,.35);}
+.tlo{background:var(--gb2);color:var(--green);border-color:rgba(201,168,76,.35);}
+.tpill:hover{filter:brightness(1.2);transform:translateY(-1px);}
+
+/* Scroll */
+.cscroll{flex:1;overflow-y:auto;padding:12px 14px 20px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth;}
+.cscroll::-webkit-scrollbar{width:3px;}
+.cscroll::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:3px;}
+
+/* ── PROPERTY CARD ──────────────────────────────── */
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:border-color .3s,transform .3s,box-shadow .3s;text-decoration:none;display:block;position:relative;flex-shrink:0;}
+.pcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 2px 2px 0;}
+.pcard.ph::before{background:var(--red);}
+.pcard.pm::before{background:var(--amber);}
+.pcard.pl::before{background:var(--green);}
+.pcard:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.25),0 0 0 1px rgba(201,168,76,.1);border-color:rgba(201,168,76,.1);}
+.pcard.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 10px 30px rgba(201,168,76,.15);}
+.pcard.hidden{display:none;}
+
+/* Card image */
+.cimgw{position:relative;overflow:hidden;}
+.cimg{width:100%;height:140px;object-fit:cover;display:block;transition:transform .4s var(--ease);}
+.pcard:hover .cimg{transform:scale(1.04);}
+.cbadge{position:absolute;top:8px;left:8px;display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--rp);font-size:.64rem;font-weight:700;backdrop-filter:blur(6px);}
+.cb-h{background:rgba(239,68,68,.85);color:var(--color-white);}
+.cb-m{background:rgba(201,168,76,.85);color:var(--color-white);}
+.cb-l{background:rgba(201,168,76,.85);color:var(--color-white);}
+.cwl{position:absolute;top:8px;right:8px;width:28px;height:28px;background:rgba(22,22,31,.8);backdrop-filter:blur(4px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.74rem;color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s ease;}
+.cwl:hover{background:rgba(239,68,68,.8);color:var(--color-white);}
+.cwl.liked{color:var(--red);background:rgba(239,68,68,.2);}
+
+/* Card body */
+.cbody{padding:11px 13px;}
+.ctags{display:flex;gap:5px;margin-bottom:6px;}
+.ctag{font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:var(--rp);background:var(--surface-2);color:var(--t2);}
+.ctitle{font-size:.87rem;font-weight:700;color:var(--t1);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmeta{font-size:.73rem;color:var(--t2);display:flex;align-items:center;gap:4px;margin-bottom:8px;}
+.cmeta i{font-size:.65rem;color:var(--t3);}
+.camen{display:flex;gap:8px;margin-bottom:10px;}
+.amen{display:flex;align-items:center;gap:3px;font-size:.68rem;color:var(--t2);}
+.amen i{font-size:.62rem;color:var(--t3);}
+.cfoot{display:flex;align-items:center;justify-content:space-between;}
+.cprice{font-size:.94rem;font-weight:800;color:var(--t1);}
+.cprice span{font-size:.7rem;font-weight:400;color:var(--t2);}
+.ccta{font-size:.72rem;font-weight:600;background:var(--ad);color:var(--accent);border:1px solid rgba(201,168,76,.2);border-radius:7px;padding:5px 10px;cursor:pointer;transition:all .18s ease;}
+.ccta:hover{background:var(--accent);color:#0a0a0f;}
+
+/* ── MAP PANEL ──────────────────────────────────── */
+.map-panel{flex:1;position:relative;overflow:hidden;min-height:100%;}
+#leafletMap{width:100%;height:100%;min-height:400px;}
+/* Dark Leaflet overrides */
+.leaflet-control-zoom{border:none!important;}
+.leaflet-control-zoom a{background:var(--glass)!important;backdrop-filter:blur(10px);color:var(--t1)!important;border:1px solid var(--gb)!important;border-radius:8px!important;width:34px!important;height:34px!important;line-height:34px!important;font-size:14px!important;margin-bottom:4px!important;box-shadow:0 4px 10px rgba(0,0,0,.2)!important;}
+.leaflet-control-zoom a:hover{background:var(--surface-2)!important;color:var(--accent)!important;}
+.leaflet-control-attribution{background:rgba(10,10,15,.7)!important;color:var(--t3)!important;font-size:.6rem!important;}
+.leaflet-control-attribution a{color:var(--accent)!important;}
+.leaflet-popup-content-wrapper{background:var(--surface)!important;color:var(--t1)!important;border-radius:12px!important;box-shadow:0 12px 40px rgba(0,0,0,.4)!important;border:1px solid var(--gb)!important;}
+.leaflet-popup-tip{background:var(--surface)!important;}
+.leaflet-popup-close-button{color:var(--t3)!important;font-size:18px!important;}
+.leaflet-popup-close-button:hover{color:var(--accent)!important;}
+
+/* ── MAP MARKERS ────────────────────────────────── */
+.mmark{position:absolute;display:flex;flex-direction:column;align-items:center;pointer-events:all;cursor:pointer;transition:transform .2s var(--ease);animation:mbnc .45s var(--ease) both;}
+@keyframes mbnc{from{transform:translateY(-18px) scale(.5);opacity:0;}70%{transform:translateY(3px) scale(1.04);opacity:1;}to{transform:translateY(0) scale(1);opacity:1;}}
+.mpill{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--rp);font-family:'Inter',sans-serif;font-size:.78rem;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.1);border:1.5px solid;transition:all .2s var(--ease);white-space:nowrap;}
+.mpill i{font-size:.72rem;}
+.mk-h .mpill{background:var(--rb);color:var(--red);border-color:var(--red);}
+.mk-m .mpill{background:var(--ab);color:var(--amber);border-color:var(--amber);}
+.mk-l .mpill{background:var(--gb2);color:var(--green);border-color:var(--green);}
+.mcaret{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;}
+.mk-h .mcaret{border-top:7px solid var(--red);}
+.mk-m .mcaret{border-top:7px solid var(--amber);}
+.mk-l .mcaret{border-top:7px solid var(--green);}
+.mmark:hover{transform:scale(1.1) translateY(-2px);z-index:20!important;}
+.mmark.active .mpill{box-shadow:0 0 0 3px var(--ag),0 8px 22px rgba(0,0,0,.5);transform:scale(1.08);}
+
+/* ── CLUSTER ────────────────────────────────────── */
+.mcluster{position:absolute;pointer-events:all;cursor:pointer;display:flex;align-items:center;justify-content:center;animation:cpulse 2s ease-in-out infinite;transition:transform .2s ease;}
+@keyframes cpulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.4);}50%{box-shadow:0 0 0 10px rgba(201,168,76,0);}}
+.cl-out{width:52px;height:52px;background:rgba(201,168,76,.15);border:1.5px solid rgba(201,168,76,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s ease;}
+.cl-in{width:38px;height:38px;background:var(--accent);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Inter',sans-serif;box-shadow:0 4px 14px rgba(201,168,76,.4);}
+.cl-num{font-size:.82rem;font-weight:800;color:#0a0a0f;line-height:1;}
+.cl-lbl{font-size:.46rem;font-weight:700;color:rgba(0,0,0,.6);}
+.mcluster:hover .cl-out{background:rgba(201,168,76,.25);transform:scale(1.08);}
+
+/* ── MAP POPUP ──────────────────────────────────── */
+.mpopup{position:absolute;z-index:100;width:230px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--gb);border-radius:var(--r);overflow:hidden;box-shadow:0 18px 56px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.05);display:none;pointer-events:none;animation:pfloat 3s ease-in-out infinite;}
+@keyframes pfloat{0%,100%{margin-top:0;}50%{margin-top:-4px;}}
+.mpopup.show{display:block;}
+.ppimg{width:100%;height:105px;object-fit:cover;}
+.ppbody{padding:11px 13px;}
+.pptags{display:flex;gap:5px;margin-bottom:6px;}
+.pptag{font-size:.62rem;font-weight:600;padding:2px 7px;border-radius:var(--rp);background:var(--surface-3);color:var(--t2);}
+.pptit{font-size:.85rem;font-weight:700;color:var(--t1);margin-bottom:3px;}
+.ppmeta{font-size:.7rem;color:var(--t2);display:flex;align-items:center;gap:4px;margin-bottom:8px;}
+.ppmeta i{font-size:.64rem;color:var(--t3);}
+.ppfoot{display:flex;align-items:center;justify-content:space-between;}
+.ppprice{font-size:.95rem;font-weight:800;}
+.ppprice span{font-size:.68rem;font-weight:400;color:var(--t2);}
+.pp-h{color:var(--red);}.pp-m{color:var(--amber);}.pp-l{color:var(--green);}
+.ppbeds{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--t2);}
+
+/* ── MAP LEGEND ─────────────────────────────────── */
+.mlegend{position:absolute;bottom:20px;left:18px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--gb);border-radius:10px;padding:12px 16px;z-index:20;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.08);}
+.mleg-h{font-size:.64rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.mleg-i{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--t1);margin-bottom:5px;}
+.ldot{width:8px;height:8px;border-radius:50%;}
+
+/* ── MAP CONTROLS ───────────────────────────────── */
+.mctrl-group{position:absolute;top:14px;right:14px;display:flex;flex-direction:column;gap:4px;z-index:20;}
+.mctrl{width:34px;height:34px;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--gb);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--t1);cursor:pointer;transition:all .18s ease;box-shadow:0 4px 10px rgba(0,0,0,.08);}
+.mctrl:hover{background:var(--surface-2);color:var(--accent);}
+
+/* ── RADIUS RING (visual indicator on map) ───────── */
+.radius-ring{position:absolute;top:46%;left:30%;width:160px;height:160px;border:2px dashed rgba(201,168,76,.4);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:5;display:none;animation:rring 1s var(--ease) both;}
+@keyframes rring{from{opacity:0;transform:translate(-50%,-50%) scale(.5);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
+
+/* ── SLIDE-OUT PANEL ─────────────────────────────── */
+.sp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:100;opacity:0;pointer-events:none;transition:opacity .28s ease;}
+.sp-overlay.open{opacity:1;pointer-events:all;}
+.sp{position:fixed;top:0;left:var(--side);bottom:0;width:380px;background:var(--bg);border-right:1px solid var(--border);z-index:110;transform:translateX(-100%);transition:transform .32s var(--ease);display:flex;flex-direction:column;box-shadow:8px 0 30px rgba(0,0,0,.06);}
+.sp.open{transform:translateX(0);}
+.sp-head{padding:20px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.sp-head h3{font-size:.95rem;font-weight:700;color:var(--t1);flex:1;}
+.sp-close{width:30px;height:30px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--t3);cursor:pointer;transition:all .15s;}
+.sp-close:hover{color:var(--accent);border-color:var(--accent);}
+.sp-body{flex:1;overflow-y:auto;padding:16px;}
+.sp-body::-webkit-scrollbar{width:3px;}
+.sp-body::-webkit-scrollbar-thumb{background:var(--surface-3);border-radius:3px;}
+.sp-empty{text-align:center;padding:50px 20px;}
+.sp-empty i{font-size:2.2rem;color:var(--surface-3);margin-bottom:14px;display:block;}
+.sp-empty p{font-size:.85rem;color:var(--t3);line-height:1.6;}
+
+/* Search Panel */
+.sp-search-input{width:100%;padding:11px 14px 11px 40px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:.85rem;color:var(--t1);outline:none;transition:border-color .2s;}
+.sp-search-input:focus{border-color:var(--accent);}
+.sp-search-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:.82rem;}
+.sp-recents{margin-top:18px;}
+.sp-rec-lbl{font-size:.66rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.sp-rec-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .15s;margin-bottom:4px;}
+.sp-rec-item:hover{background:var(--surface-2);}
+.sp-rec-ico{width:34px;height:34px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--accent);flex-shrink:0;}
+.sp-rec-txt{font-size:.82rem;font-weight:600;color:var(--t1);}
+.sp-rec-sub{font-size:.7rem;color:var(--t3);margin-top:1px;}
+.sp-quick-filters{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;}
+.sp-qf{padding:6px 14px;border-radius:var(--rp);border:1.5px solid var(--border);font-size:.74rem;font-weight:600;color:var(--t2);cursor:pointer;transition:all .18s;background:var(--surface);}
+.sp-qf:hover{border-color:var(--accent);color:var(--accent);}
+
+/* Wishlist Panel */
+.wl-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;gap:12px;margin-bottom:10px;transition:border-color .2s,transform .2s;cursor:pointer;}
+.wl-card:hover{border-color:var(--accent);transform:translateY(-1px);}
+.wl-img{width:70px;height:70px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+.wl-info{flex:1;display:flex;flex-direction:column;justify-content:center;}
+.wl-title{font-size:.82rem;font-weight:700;color:var(--t1);margin-bottom:2px;}
+.wl-meta{font-size:.7rem;color:var(--t3);display:flex;align-items:center;gap:4px;margin-bottom:6px;}
+.wl-price{font-size:.85rem;font-weight:800;color:var(--accent);}
+.wl-remove{width:26px;height:26px;border-radius:50%;background:var(--rb);border:none;display:flex;align-items:center;justify-content:center;font-size:.68rem;color:var(--red);cursor:pointer;transition:all .15s;flex-shrink:0;align-self:flex-start;}
+.wl-remove:hover{background:var(--red);color:var(--color-white);}
+.wl-count{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--rp);background:var(--ad);color:var(--accent);font-size:.7rem;font-weight:700;margin-left:auto;}
+
+/* Visits Panel */
+.vs-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;position:relative;}
+.vs-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px;}
+.vs-card.vs-upcoming::before{background:var(--accent);}
+.vs-card.vs-completed::before{background:var(--green);}
+.vs-card.vs-cancelled::before{background:var(--red);}
+.vs-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.vs-date-box{width:44px;height:48px;background:var(--ad);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+.vs-day{font-size:1rem;font-weight:800;color:var(--accent);line-height:1;}
+.vs-month{font-size:.58rem;font-weight:700;color:var(--accent);text-transform:uppercase;}
+.vs-prop-name{font-size:.82rem;font-weight:700;color:var(--t1);}
+.vs-prop-loc{font-size:.7rem;color:var(--t3);}
+.vs-time{font-size:.72rem;color:var(--t2);display:flex;align-items:center;gap:5px;}
+.vs-status{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:var(--rp);}
+.vs-s-up{background:var(--ad);color:var(--accent);}
+.vs-s-done{background:var(--gb2);color:var(--green);}
+.vs-s-cancel{background:var(--rb);color:var(--red);}
+.vs-actions{display:flex;gap:6px;margin-top:10px;}
+.vs-btn{padding:6px 12px;border-radius:8px;font-family:'Inter',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .18s;border:none;}
+.vs-btn-primary{background:var(--accent);color:var(--color-white);}
+.vs-btn-primary:hover{background:var(--color-accent-dark);}
+.vs-btn-ghost{background:var(--surface-2);color:var(--t2);border:1px solid var(--border);}
+.vs-btn-ghost:hover{color:var(--t1);}
+
+/* Inquiries Panel */
+.iq-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;}
+.iq-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.iq-avatar{width:32px;height:32px;border-radius:50%;background:var(--ad);display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:700;color:var(--accent);flex-shrink:0;}
+.iq-prop{font-size:.82rem;font-weight:700;color:var(--t1);}
+.iq-time{font-size:.66rem;color:var(--t3);margin-left:auto;}
+.iq-msg{font-size:.78rem;color:var(--t2);line-height:1.55;padding:10px 12px;background:var(--surface-2);border-radius:8px;margin-bottom:8px;}
+.iq-reply{font-size:.78rem;color:var(--green);line-height:1.55;padding:10px 12px;background:var(--gb2);border-radius:8px;border-left:3px solid var(--green);}
+.iq-status{font-size:.68rem;font-weight:600;padding:3px 9px;border-radius:var(--rp);}
+.iq-s-pending{background:var(--ab);color:var(--amber);}
+.iq-s-replied{background:var(--gb2);color:var(--green);}
+
+/* Profile Panel */
+.pf-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;margin-bottom:16px;}
+.pf-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--color-accent-light));display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;color:#0a0a0f;margin:0 auto 14px;box-shadow:0 6px 20px rgba(201,168,76,.2);}
+.pf-name{font-size:1.05rem;font-weight:700;color:var(--t1);margin-bottom:3px;}
+.pf-email{font-size:.78rem;color:var(--t3);margin-bottom:4px;}
+.pf-role{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:var(--rp);background:var(--ad);color:var(--accent);font-size:.7rem;font-weight:700;}
+.pf-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px;}
+.pf-stat{text-align:center;}
+.pf-stat-val{font-size:1.1rem;font-weight:800;color:var(--t1);}
+.pf-stat-lbl{font-size:.66rem;color:var(--t3);}
+.pf-section{margin-bottom:16px;}
+.pf-sec-title{font-size:.72rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+.pf-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:background .15s;margin-bottom:2px;}
+.pf-row:hover{background:var(--surface-2);}
+.pf-row-ico{width:32px;height:32px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--accent);flex-shrink:0;}
+.pf-row-txt{font-size:.82rem;font-weight:500;color:var(--t1);flex:1;}
+.pf-row-arr{font-size:.68rem;color:var(--t3);}
+.pf-logout{width:100%;padding:11px;border-radius:10px;background:var(--rb);border:1px solid rgba(239,68,68,.2);color:var(--red);font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.pf-logout:hover{background:var(--red);color:var(--color-white);}
+</style>
+</head>
+<body>
+
+<!-- ── FLOATING SEARCH BAR ── -->
+<div class="search-wrap">
+  <div class="sbar">
+    <div class="si" style="flex:1.8;position:relative;">
+      <span class="sico"><i class="fas fa-search"></i></span>
+      <input type="text" class="sinput" id="locInput" placeholder="Search location…" autocomplete="off"
+             oninput="handleSearch(this.value)" onfocus="showDrop()" onblur="setTimeout(hideDrop,200)">
+      <!-- Suggestions -->
+      <div class="sdrop" id="sdrop">
+        <div class="dlbl">Popular Nearby</div>
+        <div class="sug" onclick="selectLoc('Loni Kalbhor')"><div class="sugico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sugmain">Loni Kalbhor</div><div class="sugsub">Near Loni Kalbhor</div></div><span class="sugbadge">10 homes</span></div>
+        <div class="sug" onclick="selectLoc('Hadapsar')"><div class="sugico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sugmain">Hadapsar</div><div class="sugsub">Pune East Suburb</div></div><span class="sugbadge">Nearby</span></div>
+        <div class="sug" onclick="selectLoc('Magarpatta')"><div class="sugico"><i class="fas fa-building"></i></div><div><div class="sugmain">Magarpatta</div><div class="sugsub">IT Hub Township</div></div><span class="sugbadge">Nearby</span></div>
+        <div class="sug" onclick="selectLoc('Wagholi')"><div class="sugico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sugmain">Wagholi</div><div class="sugsub">Affordable Student Zone</div></div><span class="sugbadge">Nearby</span></div>
+        <div id="dynSugs"></div>
+      </div>
+    </div>
+    <div class="si" style="flex:1;"><span class="sico"><i class="fas fa-home"></i></span><select class="ssel" id="filterType" onchange="applyFilters()"><option value="">Any Type</option><option>Apartment</option><option>PG</option><option>Flat</option><option>Co-living</option><option>Villa</option></select></div>
+    <div class="si" style="flex:1;"><span class="sico"><i class="fas fa-rupee-sign"></i></span><select class="ssel" id="filterBudget" onchange="applyFilters()"><option value="">Any Budget</option><option value="low">Under ₹10k</option><option value="med">₹10k–₹15k</option><option value="high">₹15k+</option></select></div>
+    <div class="si" style="flex:.7;"><span class="sico"><i class="fas fa-bed"></i></span><select class="ssel" id="filterBeds" onchange="applyFilters()"><option value="">Beds</option><option>1 RK</option><option>1 BHK</option><option>2 BHK</option><option>3 BHK</option></select></div>
+    <button class="sbtn" onclick="doSearch()"><i class="fas fa-sliders-h"></i> Search</button>
+  </div>
+
+  <!-- ── ADVANCED FILTER BAR ── -->
+  <div class="filter-bar">
+    <span class="fchip on" onclick="toggleChip(this,'available')"><i class="fas fa-check-circle"></i> Available</span>
+    <span class="fchip" onclick="toggleChip(this,'wifi')"><i class="fas fa-wifi"></i> WiFi</span>
+    <span class="fchip" onclick="toggleChip(this,'ac')"><i class="fas fa-snowflake"></i> AC</span>
+    <span class="fchip" onclick="toggleChip(this,'parking')"><i class="fas fa-car"></i> Parking</span>
+    <span class="fchip" onclick="toggleChip(this,'meals')"><i class="fas fa-utensils"></i> Meals</span>
+    <span class="fchip" onclick="toggleChip(this,'laundry')"><i class="fas fa-tshirt"></i> Laundry</span>
+    <span class="fchip" onclick="toggleChip(this,'pool')"><i class="fas fa-swimming-pool"></i> Pool</span>
+    <div style="width:1px;height:20px;background:var(--border-2);flex-shrink:0;"></div>
+    <span style="font-size:.66rem;color:var(--t3);font-weight:700;white-space:nowrap;flex-shrink:0;">📍 RADIUS</span>
+    <select class="radius-select" onchange="setRadius(this.value)">
+      <option value="0">Any Distance</option>
+      <option value="1">Within 1 km</option>
+      <option value="3" selected>Within 3 km</option>
+      <option value="5">Within 5 km</option>
+      <option value="10">Within 10 km</option>
+    </select>
+    <span class="fchip" onclick="resetFilters()" style="margin-left:auto;"><i class="fas fa-redo-alt"></i> Reset</span>
+  </div>
+</div>
+
+<button class="mob-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')"><i class="fas fa-bars"></i></button>
+
+<!-- ── FULL SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;">
+    <a href="index.html" class="sb-logo" style="margin-bottom:0;">
+      <div class="sb-logo-icon">L</div>
+      <div class="sb-logo-txt">Liv<span>Era</span></div>
+    </a>
+    <button class="sp-close" style="display:none;" id="mobCloseSb" onclick="document.getElementById('sidebar').classList.remove('mobile-open')"><i class="fas fa-times"></i></button>
+  </div>
+
+  <div class="sb-lbl">Menu</div>
+  <div class="sb-nav">
+    <button class="sb-btn active" id="sb-explore" onclick="window.location.href='explore.html'"><i class="fas fa-map-marked-alt"></i><span>Explore Map</span></button>
+    <button class="sb-btn" id="sb-search" onclick="openPanel(event,'search')"><i class="fas fa-search"></i><span>Search</span></button>
+    <button class="sb-btn" id="sb-saved" onclick="openPanel(event,'saved')"><i class="fas fa-bookmark"></i><span>Saved Searches</span></button>
+    
+    <div class="sb-lbl">Activity</div>
+    <button class="sb-btn" id="sb-visits" onclick="openPanel(event,'visits')"><i class="fas fa-calendar-check"></i><span>Scheduled Visits</span></button>
+    <button class="sb-btn" id="sb-inquiries" onclick="openPanel(event,'inquiries')"><i class="fas fa-comment-dots"></i><span>Inquiries</span></button>
+    
+    <div class="sb-spacer"></div>
+    <div class="sb-lbl">Account</div>
+    <button class="sb-btn" id="sb-profile" onclick="openPanel(event,'profile')"><i class="fas fa-user-circle"></i><span>My Profile</span></button>
+    <button class="sb-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Sign Out</span></button>
+  </div>
+</aside>
+
+<!-- PANEL OVERLAY -->
+<div class="sp-overlay" id="spOverlay" onclick="closePanel()"></div>
+
+<!-- ── APP LAYOUT ── -->
+<div class="app-layout">
+
+  <!-- LISTING PANEL -->
+  <div class="list-panel">
+    <div class="ptop">
+      <div class="pheader"><h2>Available Properties</h2><span class="pcnt" id="pcnt">4 listings</span></div>
+      <div class="tier-row">
+        <span class="tpill thi" onclick="filterTier('high')"><i class="fas fa-home"></i> High · ₹15k+</span>
+        <span class="tpill tme" onclick="filterTier('med')"><i class="fas fa-home"></i> Med · ₹10–15k</span>
+        <span class="tpill tlo" onclick="filterTier('low')"><i class="fas fa-home"></i> Low · ₹10k–</span>
+      </div>
+    </div>
+
+    <div class="cscroll" id="cardList">
+      <!-- Cards generated dynamically by JS -->
+    </div>
+  </div>
+
+  <!-- MAP PANEL -->
+  <div class="map-panel" id="mapPanel">
+    <div id="leafletMap"></div>
+
+    <!-- Legend -->
+    <div class="mlegend" style="z-index:500;">
+      <div class="mleg-h">Price Tiers</div>
+      <div class="mleg-i"><span class="ldot" style="background:var(--red);"></span> High (₹15k+)</div>
+      <div class="mleg-i"><span class="ldot" style="background:#c9a84c;"></span> Medium (₹10–15k)</div>
+      <div class="mleg-i"><span class="ldot" style="background:#a8882e;"></span> Low (under ₹10k)</div>
+    </div>
+
+    <!-- Open in Maps link -->
+    <a href="https://www.google.com/maps/place/Loni+Kalbhor,+Maharashtra/" target="_blank"
+       style="position:absolute;top:14px;left:14px;z-index:500;background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--gb);border-radius:8px;padding:8px 14px;font-size:.78rem;font-weight:600;color:var(--t1);text-decoration:none;display:flex;align-items:center;gap:6px;transition:all .2s;">
+      <i class="fas fa-external-link-alt" style="color:var(--accent);font-size:.7rem;"></i> Open in Google Maps
+    </a>
+  </div>
+</div>
+
+<!-- ── INQUIRY MODAL ── -->
+<div id="inqModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+  <div style="background:var(--surface);border:1px solid var(--border-2);border-radius:var(--r);padding:28px;width:min(440px,90vw);position:relative;box-shadow:0 24px 64px rgba(0,0,0,.3);">
+    <button onclick="closeInquiry()" style="position:absolute;top:14px;right:14px;background:var(--surface-2);border:none;border-radius:7px;width:28px;height:28px;color:var(--t2);cursor:pointer;font-size:.8rem;"><i class="fas fa-times"></i></button>
+    <h3 style="font-size:1rem;font-weight:700;color:var(--t1);margin-bottom:4px;">Send Inquiry</h3>
+    <p style="font-size:.78rem;color:var(--t2);margin-bottom:18px;" id="inqPropName">About this property</p>
+    <textarea id="inqMsg" placeholder="Hi, I'm interested in this property and would like to schedule a visit…" style="width:100%;height:110px;background:var(--surface-2);border:1px solid var(--border-2);border-radius:10px;color:var(--t1);font-family:'Inter',sans-serif;font-size:.85rem;padding:12px;resize:none;outline:none;transition:border-color .2s;"></textarea>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button onclick="sendInquiry()" style="flex:1;background:var(--accent);border:none;border-radius:10px;color:var(--color-white);font-family:'Inter',sans-serif;font-size:.85rem;font-weight:700;padding:11px;cursor:pointer;transition:background .2s;"><i class="fas fa-paper-plane"></i> Send Message</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ SLIDE-OUT PANELS ═══════ -->
+
+<!-- ── SEARCH PANEL ── -->
+<div class="sp" id="panel-search">
+  <div class="sp-head"><i class="fas fa-search" style="color:var(--accent);"></i><h3>Search Properties</h3><button class="sp-close" onclick="closePanel()"><i class="fas fa-times"></i></button></div>
+  <div class="sp-body">
+    <div style="position:relative;">
+      <i class="fas fa-search sp-search-ico"></i>
+      <input type="text" class="sp-search-input" placeholder="Search by area, type, price…" id="spSearchIn" oninput="panelSearch(this.value)">
+    </div>
+    <div class="sp-quick-filters">
+      <span class="sp-qf" onclick="panelSearchTag('PG')">🏠 PG Rooms</span>
+      <span class="sp-qf" onclick="panelSearchTag('Flat')">🏢 Flats</span>
+      <span class="sp-qf" onclick="panelSearchTag('Villa')">🏡 Villas</span>
+      <span class="sp-qf" onclick="panelSearchTag('Under ₹10k')">💰 Under ₹10k</span>
+      <span class="sp-qf" onclick="panelSearchTag('WiFi')">📶 WiFi Included</span>
+      <span class="sp-qf" onclick="panelSearchTag('Near Campus')">📍 Near Campus</span>
+    </div>
+    <div class="sp-recents" id="spSearchResults">
+      <div class="sp-rec-lbl">Popular Searches</div>
+      <div class="sp-rec-item" onclick="closePanel();selectLoc('Loni Kalbhor')"><div class="sp-rec-ico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sp-rec-txt">Loni Kalbhor</div><div class="sp-rec-sub">Near Loni Kalbhor · 10 homes</div></div></div>
+      <div class="sp-rec-item" onclick="closePanel();selectLoc('Hadapsar')"><div class="sp-rec-ico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sp-rec-txt">Hadapsar</div><div class="sp-rec-sub">East Pune</div></div></div>
+      <div class="sp-rec-item" onclick="closePanel();selectLoc('Kharadi')"><div class="sp-rec-ico"><i class="fas fa-building"></i></div><div><div class="sp-rec-txt">Kharadi</div><div class="sp-rec-sub">IT Hub</div></div></div>
+      <div class="sp-rec-item" onclick="closePanel();selectLoc('Wagholi')"><div class="sp-rec-ico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sp-rec-txt">Wagholi</div><div class="sp-rec-sub">Budget Zone</div></div></div>
+      <div class="sp-rec-item" onclick="closePanel();selectLoc('Magarpatta')"><div class="sp-rec-ico"><i class="fas fa-city"></i></div><div><div class="sp-rec-txt">Magarpatta City</div><div class="sp-rec-sub">Township</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SAVED SEARCHES PANEL ── -->
+<div class="sp" id="panel-saved">
+  <div class="sp-head"><i class="fas fa-bookmark" style="color:var(--accent);"></i><h3>Saved Searches</h3><button class="sp-close" onclick="closePanel()"><i class="fas fa-times"></i></button></div>
+  <div class="sp-body">
+    <div class="sp-empty">
+      <i class="fas fa-bookmark"></i>
+      <p>You haven't saved any searches yet. Click the 'Save Search' button when exploring to get updates on new listings.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── WISHLIST PANEL ── -->
+<div class="sp" id="panel-wishlist">
+  <div class="sp-head"><i class="fas fa-heart" style="color:var(--red);"></i><h3>My Wishlist</h3><span class="wl-count" id="wlCount">0 saved</span><button class="sp-close" onclick="closePanel()"><i class="fas fa-times"></i></button></div>
+  <div class="sp-body" id="wlList"></div>
+</div>
+
+<!-- ── VISITS PANEL ── -->
+<div class="sp" id="panel-visits">
+  <div class="sp-head"><i class="fas fa-calendar-check" style="color:var(--green);"></i><h3>Scheduled Visits</h3><button class="sp-close" onclick="closePanel()"><i class="fas fa-times"></i></button></div>
+  <div class="sp-body" id="vsList">
+    <!-- Dynamically populated from localStorage -->
+  </div>
+</div>
+
+<!-- ── INQUIRIES PANEL ── -->
+<div class="sp" id="panel-inquiries">
+  <div class="sp-head"><i class="fas fa-comment-dots" style="color:var(--accent);"></i><h3>My Inquiries</h3><button class="sp-close" onclick="closePanel()"><i class="fas fa-times"></i></button></div>
+  <div class="sp-body" id="iqList"></div>
+</div>
+
+<!-- ── PROFILE PANEL ── -->
+<div class="sp" id="panel-profile">
+  <div class="sp-head"><i class="fas fa-user-circle" style="color:var(--accent);"></i><h3>My Profile</h3><button class="sp-close" onclick="closePanel()"><i class="fas fa-times"></i></button></div>
+  <div class="sp-body">
+    <div class="pf-card">
+      <div class="pf-avatar" id="pfAvatar">S</div>
+      <div class="pf-name" id="pfName">Student</div>
+      <div class="pf-email" id="pfEmail">student@email.com</div>
+      <span class="pf-role"><i class="fas fa-graduation-cap"></i> Student</span>
+      <div class="pf-stats">
+        <div class="pf-stat"><div class="pf-stat-val" id="pfWl">0</div><div class="pf-stat-lbl">Wishlist</div></div>
+        <div class="pf-stat"><div class="pf-stat-val" id="pfIq">0</div><div class="pf-stat-lbl">Inquiries</div></div>
+        <div class="pf-stat"><div class="pf-stat-val">2</div><div class="pf-stat-lbl">Visits</div></div>
+      </div>
+    </div>
+    <div class="pf-section">
+      <div class="pf-sec-title">Account</div>
+      <div class="pf-row"><div class="pf-row-ico"><i class="fas fa-pen"></i></div><div class="pf-row-txt">Edit Profile</div><i class="fas fa-chevron-right pf-row-arr"></i></div>
+      <div class="pf-row"><div class="pf-row-ico"><i class="fas fa-bell"></i></div><div class="pf-row-txt">Notifications</div><i class="fas fa-chevron-right pf-row-arr"></i></div>
+      <div class="pf-row"><div class="pf-row-ico"><i class="fas fa-shield-alt"></i></div><div class="pf-row-txt">Privacy & Security</div><i class="fas fa-chevron-right pf-row-arr"></i></div>
+    </div>
+    <div class="pf-section">
+      <div class="pf-sec-title">Preferences</div>
+      <div class="pf-row"><div class="pf-row-ico"><i class="fas fa-sliders-h"></i></div><div class="pf-row-txt">Search Preferences</div><i class="fas fa-chevron-right pf-row-arr"></i></div>
+      <div class="pf-row"><div class="pf-row-ico"><i class="fas fa-map-marker-alt"></i></div><div class="pf-row-txt">Preferred Locations</div><i class="fas fa-chevron-right pf-row-arr"></i></div>
+      <div class="pf-row"><div class="pf-row-ico"><i class="fas fa-rupee-sign"></i></div><div class="pf-row-txt">Budget Range</div><i class="fas fa-chevron-right pf-row-arr"></i></div>
+    </div>
+    <div class="pf-section">
+      <div class="pf-sec-title">Support</div>
+      <div class="pf-row"><div class="pf-row-ico"><i class="fas fa-question-circle"></i></div><div class="pf-row-txt">Help Center</div><i class="fas fa-chevron-right pf-row-arr"></i></div>
+      <div class="pf-row"><div class="pf-row-ico"><i class="fas fa-headset"></i></div><div class="pf-row-txt">Contact Support</div><i class="fas fa-chevron-right pf-row-arr"></i></div>
+    </div>
+    <button class="pf-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div id="toast" style="position:fixed;bottom:28px;right:28px;background:var(--surface-3);border:1px solid var(--border-2);border-radius:10px;padding:12px 18px;font-size:.82rem;color:var(--t1);box-shadow:0 8px 24px rgba(0,0,0,.08);z-index:999;display:none;align-items:center;gap:10px;animation:fdwn .3s var(--ease);">
+  <i class="fas fa-check-circle" style="color:var(--green);"></i>
+  <span id="toastMsg">Done!</span>
+</div>
+
+<script>
+const props = getLivEraListings();
+const tierCls={high:'pp-h',med:'pp-m',low:'pp-l'};
+const tierColors={high:'#ef4444',med:'#c9a84c',low:'#a8882e'};
+let activeFilters=new Set();
+let activeTier=null;
+let map, markers=[];
+
+// ── GENERATE EXTRA CARDS ────────────────────────
+function generateCards(){
+  const cardList=document.getElementById('cardList');
+  // Clear existing cards
+  cardList.innerHTML='';
+  props.forEach((p,i)=>{
+    const tierClass={high:'ph',med:'pm',low:'pl'}[p.tier];
+    const badgeClass={high:'cb-h',med:'cb-m',low:'cb-l'}[p.tier];
+    const badgeText={high:'High',med:'Medium',low:'Low'}[p.tier];
+    cardList.innerHTML+=`
+      <div class="pcard ${tierClass}" data-id="${i}" data-tier="${p.tier}" data-amenities="${p.amenities}" data-type="${p.tags[0]}" data-beds="${p.tags[1]||''}"
+           onmouseenter="previewMark(${i})" onmouseleave="clearPrev()">
+        <div class="cimgw" onclick="activateMarker(${i})">
+          <img class="cimg" src="${p.img}" onerror="this.src='${p.fb}'" alt="">
+          <span class="cbadge ${badgeClass}"><i class="fas fa-home"></i> ${badgeText}</span>
+          <div class="cwl" onclick="toggleWL(event,this)"><i class="fas fa-heart"></i></div>
+        </div>
+        <div class="cbody">
+          <div class="ctags">${p.tags.map(t=>`<span class="ctag">${t}</span>`).join('')}<span class="ctag">Available</span></div>
+          <a href="property-detail.html?id=${i}" class="ctitle" style="text-decoration:none;display:block;">${p.title}</a>
+          <div class="cmeta"><i class="fas fa-map-marker-alt"></i> ${p.meta}</div>
+          <div class="camen">${(p.amenities||'').split(',').map(a=>`<span class="amen"><i class="fas fa-${amenityIcon(a)}"></i> ${capitalize(a)}</span>`).join('')}</div>
+          <div class="cfoot"><div class="cprice">₹${p.rent.toLocaleString()} <span>/ mo</span></div><a href="property-detail.html?id=${i}" class="ccta" style="text-decoration:none;">View Details</a></div>
+        </div>
+      </div>`;
+  });
+  document.getElementById('pcnt').textContent=props.length+' listings';
+}
+function amenityIcon(a){return {wifi:'wifi',ac:'snowflake',parking:'car',meals:'utensils',laundry:'tshirt',pool:'swimming-pool'}[a]||'check';}
+function capitalize(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+// ── LEAFLET MAP ────────────────────────────────
+function initMap(){
+  map=L.map('leafletMap',{
+    center:[18.4545,73.9880],
+    zoom:13,
+    zoomControl:true,
+    attributionControl:true
+  });
+  // Dark tile layer
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains:'abcd',
+    maxZoom:19
+  }).addTo(map);
+
+  // Add markers for all properties
+  props.forEach((p,i)=>{
+    const color=tierColors[p.tier];
+    const icon=L.divIcon({
+      className:'custom-marker',
+      html:`<div style="
+        background:${color};
+        color:#fff;
+        padding:6px 12px;
+        border-radius:20px;
+        font-family:Inter,sans-serif;
+        font-size:12px;
+        font-weight:700;
+        white-space:nowrap;
+        box-shadow:0 4px 14px rgba(0,0,0,.4);
+        border:2px solid rgba(255,255,255,.2);
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        gap:5px;
+        transition:all .2s;
+      "><i class="fas fa-home" style="font-size:10px;"></i> ₹${p.rent}</div>`,
+      iconSize:[null,null],
+      iconAnchor:[50,20]
+    });
+    const marker=L.marker([p.lat,p.lng],{icon}).addTo(map);
+    marker.bindPopup(`
+      <div style="min-width:200px;padding:4px;">
+        <img src="${p.img}" onerror="this.src='${p.fb}'" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:8px;">
+        <div style="display:flex;gap:4px;margin-bottom:6px;">${p.tags.map(t=>`<span style="font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:20px;background:var(--surface-2);color:var(--t2);">${t}</span>`).join('')}</div>
+        <div style="font-size:.88rem;font-weight:700;color:var(--t1);margin-bottom:3px;">${p.title}</div>
+        <div style="font-size:.75rem;color:var(--t3);display:flex;align-items:center;gap:4px;margin-bottom:8px;"><i class="fas fa-map-marker-alt" style="font-size:.65rem;"></i> ${p.meta}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:1rem;font-weight:800;color:${color};">₹${p.rent.toLocaleString()}<span style="font-size:.7rem;font-weight:400;color:var(--t2);"> /mo</span></span>
+          <span style="font-size:.72rem;color:var(--t2);"><i class="fas fa-bed"></i> ${p.beds}</span>
+        </div>
+        <a href="property-detail.html?id=${i}" style="display:block;width:100%;margin-top:10px;padding:8px;background:var(--accent);border:none;border-radius:8px;color:#0a0a0f;font-family:Inter,sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;">View Details</a>
+      </div>
+    `,{maxWidth:260,className:'dark-popup'});
+    marker.on('click',()=>{
+      document.querySelector(`.pcard[data-id="${i}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});
+      activateMarker(i);
+    });
+    markers.push(marker);
+  });
+
+  // Add Loni Kalbhor marker
+  const mitIcon=L.divIcon({
+    className:'custom-marker',
+    html:`<div style="
+      background:#c9a84c;
+      color:#0a0a0f;
+      padding:6px 12px;
+      border-radius:20px;
+      font-family:Inter,sans-serif;
+      font-size:11px;
+      font-weight:800;
+      white-space:nowrap;
+      box-shadow:0 4px 14px rgba(201,168,76,.4);
+      border:2px solid rgba(201,168,76,.5);
+      display:flex;
+      align-items:center;
+      gap:5px;
+    "><i class="fas fa-university" style="font-size:10px;"></i> Loni Kalbhor</div>`,
+    iconSize:[null,null],
+    iconAnchor:[75,20]
+  });
+  L.marker([18.4530,73.9870],{icon:mitIcon}).addTo(map)
+    .bindPopup('<div style="font-weight:700;color:var(--t1);">Loni Kalbhor</div><div style="font-size:.78rem;color:var(--t3);">Loni Kalbhor, Pune</div>');
+
+  // Force Leaflet to recalculate container size (fixes blank tiles in flex layouts)
+  setTimeout(()=>{ map.invalidateSize(); },300);
+}
+
+// ── SEARCH ──────────────────────────────────────
+function showDrop(){document.getElementById('sdrop').classList.add('show');}
+function hideDrop(){document.getElementById('sdrop').classList.remove('show');}
+function handleSearch(q){
+  const dyn=document.getElementById('dynSugs');
+  if(!q){dyn.innerHTML='';filterBySearchText('');return;}
+  const all=['Loni Kalbhor','Loni Station Area','Loni Riverside','Hadapsar','Magarpatta','Wagholi','Kharadi','Viman Nagar'];
+  const m=all.filter(x=>x.toLowerCase().includes(q.toLowerCase()));
+  dyn.innerHTML=m.length?`<div class="dlbl">Suggestions</div>`+m.map(s=>`<div class="sug" onclick="selectLoc('${s}')"><div class="sugico"><i class="fas fa-search"></i></div><div><div class="sugmain">${s}</div><div class="sugsub">Pune, Maharashtra</div></div></div>`).join(''):'';
+  showDrop();
+  // Also filter listing cards in real-time
+  filterBySearchText(q);
+}
+function filterBySearchText(q){
+  if(!q){document.querySelectorAll('.pcard').forEach(c=>c.classList.remove('hidden'));applyFilters();return;}
+  const ql=q.toLowerCase();
+  const cards=document.querySelectorAll('.pcard');
+  let vis=0;
+  cards.forEach((c,idx)=>{
+    const p=props[idx];
+    const searchable=(p.title+' '+p.meta+' '+(p.tags||[]).join(' ')+' '+p.type+' '+p.beds).toLowerCase();
+    const show=searchable.includes(ql);
+    c.classList.toggle('hidden',!show);
+    if(markers[idx]){if(show) markers[idx].addTo(map); else map.removeLayer(markers[idx]);}
+    if(show) vis++;
+  });
+  document.getElementById('pcnt').textContent=vis+' listing'+(vis!==1?'s':'');
+}
+const locCoords={'Loni Kalbhor':[18.4545,73.9880],'Hadapsar':[18.5018,73.9348],'Kharadi':[18.5520,73.9468],'Wagholi':[18.5805,73.9765],'Magarpatta':[18.5100,73.9350],'Loni Station Area':[18.4600,73.9850],'Loni Riverside':[18.4500,73.9900],'Viman Nagar':[18.5680,73.9150]};
+function selectLoc(l){
+  document.getElementById('locInput').value=l;
+  hideDrop();
+  const coords=locCoords[l]||[18.4545,73.9880];
+  map.flyTo(coords,14,{duration:1.5});
+  // Filter cards to show matching listings
+  filterBySearchText(l);
+  showToast('📍 Showing results near '+l);
+}
+function doSearch(){selectLoc(document.getElementById('locInput').value||'Loni Kalbhor');}
+
+// ── FILTERS ─────────────────────────────────────
+function toggleChip(el,key){
+  el.classList.toggle('on');
+  if(activeFilters.has(key)) activeFilters.delete(key);
+  else activeFilters.add(key);
+  applyFilters();
+}
+function applyFilters(){
+  const cards=document.querySelectorAll('.pcard');
+  const selType=(document.getElementById('filterType')||{}).value||'';
+  const selBudget=(document.getElementById('filterBudget')||{}).value||'';
+  const selBeds=(document.getElementById('filterBeds')||{}).value||'';
+  let vis=0;
+  cards.forEach((c,idx)=>{
+    const tier=c.dataset.tier;
+    const amen=(c.dataset.amenities||'').split(',');
+    const cType=c.dataset.type||'';
+    const cBeds=c.dataset.beds||'';
+    let show=true;
+    // Tier pill filter
+    if(activeTier && tier!==activeTier) show=false;
+    // Type dropdown
+    if(selType && cType.toLowerCase()!==selType.toLowerCase()) show=false;
+    // Budget dropdown
+    if(selBudget && tier!==selBudget) show=false;
+    // Beds dropdown
+    if(selBeds && cBeds!==selBeds) show=false;
+    // Amenity chip filters
+    if(activeFilters.size){
+      for(let f of activeFilters){
+        if(f==='available') continue;
+        if(!amen.includes(f)){show=false;break;}
+      }
+    }
+    c.classList.toggle('hidden',!show);
+    if(markers[idx]){
+      if(show) markers[idx].addTo(map);
+      else map.removeLayer(markers[idx]);
+    }
+    if(show) vis++;
+  });
+  document.getElementById('pcnt').textContent=vis+' listing'+(vis!==1?'s':'');
+}
+function filterTier(t){
+  activeTier=(activeTier===t)?null:t;
+  applyFilters();
+}
+function setRadius(km){
+  showToast(km && km!=='0' ? `📍 Filtering within ${km} km radius` : '📍 Showing all distances');
+}
+function resetFilters(){
+  activeFilters.clear();activeTier=null;
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));
+  document.querySelector('.fchip').classList.add('on');
+  // Reset dropdowns
+  ['filterType','filterBudget','filterBeds'].forEach(id=>{const el=document.getElementById(id);if(el) el.value='';});
+  document.querySelectorAll('.pcard').forEach(c=>c.classList.remove('hidden'));
+  document.getElementById('pcnt').textContent=props.length+' listings';
+  markers.forEach(m=>m.addTo(map));
+  map.flyTo([18.4545,73.9880],13,{duration:1});
+}
+
+// ── MARKER INTERACTION ──────────────────────────
+function previewMark(id){
+  document.querySelectorAll('.pcard').forEach(c=>c.classList.remove('active'));
+  if(markers[id]) markers[id].openPopup();
+}
+function clearPrev(){
+  // Don't auto-close popups - let user interact
+}
+function activateMarker(id){
+  document.querySelectorAll('.pcard').forEach(c=>c.classList.remove('active'));
+  document.querySelector(`.pcard[data-id="${id}"]`)?.classList.add('active');
+  if(markers[id]){
+    map.flyTo([props[id].lat,props[id].lng],15,{duration:1});
+    markers[id].openPopup();
+  }
+}
+function markerClick(id){
+  activateMarker(id);
+  document.querySelector(`.pcard[data-id="${id}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// ── INQUIRY ─────────────────────────────────────
+let inqTarget=null;
+function openInquiry(e,id){
+  e.preventDefault();e.stopPropagation();
+  inqTarget=id;
+  const p=props[id];
+  document.getElementById('inqPropName').textContent='About: '+p.title;
+  document.getElementById('inqMsg').value='';
+  const m=document.getElementById('inqModal');
+  m.style.display='flex';
+}
+function closeInquiry(){document.getElementById('inqModal').style.display='none';}
+function sendInquiry(){
+  const msg=document.getElementById('inqMsg').value.trim();
+  if(!msg)return;
+  closeInquiry();
+  showToast('✅ Inquiry sent! The lister will respond shortly.');
+  const inqs=JSON.parse(localStorage.getItem('inquiries')||'[]');
+  inqs.push({propId:inqTarget,msg,time:new Date().toISOString()});
+  localStorage.setItem('inquiries',JSON.stringify(inqs));
+}
+
+// ── WISHLIST ────────────────────────────────────
+function getWishlist(){ return JSON.parse(localStorage.getItem('wishlist')||'[]'); }
+function saveWishlist(wl){ localStorage.setItem('wishlist',JSON.stringify(wl)); updateWlUI(); }
+
+function toggleWL(e,el){
+  e.preventDefault();e.stopPropagation();
+  const card=el.closest('.pcard');
+  const id=parseInt(card.dataset.id);
+  let wl=getWishlist();
+  if(wl.includes(id)){
+    wl=wl.filter(x=>x!==id);
+    el.classList.remove('liked');
+    showToast('💔 Removed from wishlist.');
+  } else {
+    wl.push(id);
+    el.classList.add('liked');
+    showToast('❤️ Added to wishlist!');
+  }
+  saveWishlist(wl);
+}
+
+function updateWlUI(){
+  const wl=getWishlist();
+  const dot=document.getElementById('wlDot');
+  if(dot) dot.style.display=wl.length?'block':'none';
+  document.querySelectorAll('.pcard').forEach(c=>{
+    const id=parseInt(c.dataset.id);
+    const btn=c.querySelector('.cwl');
+    if(btn){if(wl.includes(id)) btn.classList.add('liked'); else btn.classList.remove('liked');}
+  });
+}
+
+function renderWishlistPanel(){
+  const wl=getWishlist();
+  const box=document.getElementById('wlList');
+  document.getElementById('wlCount').textContent=wl.length+' saved';
+  if(!wl.length){
+    box.innerHTML='<div class="sp-empty"><i class="far fa-heart"></i><p>Your wishlist is empty.<br>Tap the ❤️ on any property to save it here.</p></div>';
+    return;
+  }
+  box.innerHTML=wl.map(id=>{
+    const p=props[id]; if(!p) return '';
+    return `<div class="wl-card" onclick="closePanel();markerClick(${id});">
+      <img class="wl-img" src="${p.img}" onerror="this.src='${p.fb}'" alt="">
+      <div class="wl-info"><div class="wl-title">${p.title}</div><div class="wl-meta"><i class="fas fa-map-marker-alt"></i> ${p.meta}</div><div class="wl-price">${p.price} /mo</div></div>
+      <button class="wl-remove" onclick="event.stopPropagation();removeWl(${id})" title="Remove"><i class="fas fa-times"></i></button>
+    </div>`;
+  }).join('');
+}
+
+function removeWl(id){
+  let wl=getWishlist().filter(x=>x!==id);
+  saveWishlist(wl);
+  renderWishlistPanel();
+  showToast('Removed from wishlist.');
+}
+
+// ── INQUIRIES PANEL ─────────────────────────────
+function renderInquiriesPanel(){
+  const inqs=JSON.parse(localStorage.getItem('inquiries')||'[]');
+  const box=document.getElementById('iqList');
+  if(!inqs.length){
+    box.innerHTML='<div class="sp-empty"><i class="far fa-comment-dots"></i><p>No inquiries yet.<br>Send a message to any property owner to start.</p></div>';
+    return;
+  }
+  box.innerHTML=inqs.slice().reverse().map((iq,i)=>{
+    const p=props[iq.propId];
+    const dt=new Date(iq.time);
+    const ago=timeAgo(dt);
+    const replied=i%3===0;
+    return `<div class="iq-card">
+      <div class="iq-top">
+        <div class="iq-avatar"><i class="fas fa-paper-plane"></i></div>
+        <div><div class="iq-prop">${p?p.title:'Property'}</div><div style="font-size:.68rem;color:var(--t3);">${p?p.meta:''}</div></div>
+        <span class="iq-time">${ago}</span>
+      </div>
+      <div class="iq-msg">${iq.msg}</div>
+      ${replied?'<div class="iq-reply"><strong>Lister replied:</strong> Thank you for your interest! You can visit anytime between 10 AM – 6 PM. Please call before coming.</div>':''}
+      <div style="margin-top:8px;"><span class="iq-status ${replied?'iq-s-replied':'iq-s-pending'}">${replied?'✅ Replied':'⏳ Pending'}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function timeAgo(d){
+  const s=Math.floor((Date.now()-d.getTime())/1000);
+  if(s<60) return 'Just now';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+// ── SEARCH PANEL ────────────────────────────────
+function panelSearch(q){
+  const box=document.getElementById('spSearchResults');
+  if(!q){ box.innerHTML=defaultSearchResults(); return; }
+  const all=['Loni Kalbhor','Loni Station','Hadapsar','Magarpatta','Wagholi','Kharadi','Viman Nagar','Hinjewadi','Koregaon Park','Baner'];
+  const m=all.filter(x=>x.toLowerCase().includes(q.toLowerCase()));
+  if(!m.length){ box.innerHTML='<div class="sp-rec-lbl">No results</div><div style="text-align:center;padding:20px;color:var(--t3);font-size:.82rem;">Try a different keyword</div>'; return; }
+  box.innerHTML='<div class="sp-rec-lbl">Results</div>'+m.map(s=>
+    `<div class="sp-rec-item" onclick="closePanel();selectLoc('${s}')"><div class="sp-rec-ico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sp-rec-txt">${s}</div><div class="sp-rec-sub">Pune, Maharashtra</div></div></div>`
+  ).join('');
+}
+function panelSearchTag(tag){
+  document.getElementById('spSearchIn').value=tag;
+  panelSearch(tag);
+}
+function defaultSearchResults(){
+  return `<div class="sp-rec-lbl">Popular Searches</div>
+    <div class="sp-rec-item" onclick="closePanel();selectLoc('Loni Kalbhor')"><div class="sp-rec-ico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sp-rec-txt">Loni Kalbhor</div><div class="sp-rec-sub">Near Loni Kalbhor · ${props.filter(p=>p.meta.includes('Loni')).length} homes</div></div></div>
+    <div class="sp-rec-item" onclick="closePanel();selectLoc('Hadapsar')"><div class="sp-rec-ico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sp-rec-txt">Hadapsar</div><div class="sp-rec-sub">East Pune</div></div></div>
+    <div class="sp-rec-item" onclick="closePanel();selectLoc('Kharadi')"><div class="sp-rec-ico"><i class="fas fa-building"></i></div><div><div class="sp-rec-txt">Kharadi</div><div class="sp-rec-sub">IT Hub</div></div></div>
+    <div class="sp-rec-item" onclick="closePanel();selectLoc('Wagholi')"><div class="sp-rec-ico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sp-rec-txt">Wagholi</div><div class="sp-rec-sub">Budget Zone</div></div></div>`;
+}
+
+// ── PANEL OPEN/CLOSE SYSTEM ─────────────────────
+let activePanel=null;
+function openPanel(e,name){
+  if(e) e.preventDefault();
+  if(activePanel) closePanel();
+  activePanel=name;
+  document.getElementById('panel-'+name).classList.add('open');
+  document.getElementById('spOverlay').classList.add('open');
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('sb-'+name);
+  if(btn) btn.classList.add('active');
+  if(name==='wishlist') renderWishlistPanel();
+  if(name==='inquiries') renderInquiriesPanel();
+  if(name==='profile') renderProfilePanel();
+  if(name==='visits') renderVisitsPanel();
+  document.getElementById('sidebar').classList.remove('mobile-open');
+}
+
+// ── VISITS PANEL (Dynamic from localStorage) ────
+function renderVisitsPanel(){
+  const visits=JSON.parse(localStorage.getItem('visits')||'[]');
+  const box=document.getElementById('vsList');
+  if(!visits.length){
+    box.innerHTML='<div class="sp-empty"><i class="fas fa-calendar-check"></i><p>No scheduled visits yet.<br>Visit a property detail page and click "Schedule Visit" to book one.</p></div>';
+    return;
+  }
+  box.innerHTML=visits.slice().reverse().map((v,i)=>{
+    const dt=new Date(v.date+'T00:00:00');
+    const day=dt.getDate();
+    const month=dt.toLocaleString('en',{month:'short'});
+    const isUpcoming=dt>=new Date(new Date().toDateString());
+    const statusClass=v.status==='cancelled'?'vs-cancelled':(isUpcoming?'vs-upcoming':'vs-completed');
+    const statusBadge=v.status==='cancelled'?'<span class="vs-status vs-s-cancel">Cancelled</span>':(isUpcoming?'<span class="vs-status vs-s-up">Upcoming</span>':'<span class="vs-status vs-s-done">Completed</span>');
+    return `<div class="vs-card ${statusClass}">
+      <div class="vs-top">
+        <div class="vs-date-box"><span class="vs-day">${day}</span><span class="vs-month">${month}</span></div>
+        <div><div class="vs-prop-name">${v.propTitle||'Property'}</div><div class="vs-prop-loc"><i class="fas fa-map-marker-alt" style="font-size:.62rem;"></i> ${v.propLocation||'Loni Kalbhor'}</div></div>
+        ${statusBadge}
+      </div>
+      <div class="vs-time"><i class="fas fa-clock"></i> ${v.time}</div>
+      ${isUpcoming && v.status!=='cancelled'?`<div class="vs-actions">
+        <button class="vs-btn vs-btn-primary" onclick="window.open('https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(v.propLocation||'Loni Kalbhor, Pune')}', '_blank')"><i class="fas fa-map-marker-alt"></i> Get Directions</button>
+        <button class="vs-btn vs-btn-ghost" onclick="cancelVisit(${visits.length-1-i})">Cancel</button>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+function cancelVisit(idx){
+  const visits=JSON.parse(localStorage.getItem('visits')||'[]');
+  if(visits[idx]) visits[idx].status='cancelled';
+  localStorage.setItem('visits',JSON.stringify(visits));
+  renderVisitsPanel();
+  showToast('Visit cancelled.');
+}
+function closePanel(){
+  if(!activePanel) return;
+  document.getElementById('panel-'+activePanel).classList.remove('open');
+  document.getElementById('spOverlay').classList.remove('open');
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sb-explore').classList.add('active');
+  activePanel=null;
+}
+
+// ── PROFILE ─────────────────────────────────────
+function renderProfilePanel(){
+  const u=JSON.parse(localStorage.getItem('user')||'{}');
+  const e=u.email||'student@email.com';
+  document.getElementById('pfAvatar').textContent=e[0].toUpperCase();
+  document.getElementById('pfName').textContent=e.split('@')[0];
+  document.getElementById('pfEmail').textContent=e;
+  document.getElementById('pfWl').textContent=getWishlist().length;
+  document.getElementById('pfIq').textContent=JSON.parse(localStorage.getItem('inquiries')||'[]').length;
+}
+
+// ── TOAST ───────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.style.display='flex';
+  clearTimeout(t._tid);
+  t._tid=setTimeout(()=>{t.style.display='none';},3000);
+}
+
+// ── BOOT ────────────────────────────────────────
+function logout(){localStorage.removeItem('user');window.location.href='login.html';}
+window.addEventListener('DOMContentLoaded',()=>{
+  const u=JSON.parse(localStorage.getItem('user')||'null');
+  if(!u||!u.role){window.location.href='login.html';return;}
+  if(u.role==='lister'){window.location.href='dashboard.html';return;}
+  
+  // Generate all property cards
+  generateCards();
+  
+  // Initialize Leaflet map
+  initMap();
+  
+  // Fix Leaflet Map Glitches (Prevent grey tiles when layout shifts)
+  const mapPanel = document.getElementById('mapPanel');
+  if(mapPanel && typeof ResizeObserver !== 'undefined') {
+    const resizeObserver = new ResizeObserver(() => {
+      if(map) map.invalidateSize();
+    });
+    resizeObserver.observe(mapPanel);
+  }
+  
+  // Sync wishlist state
+  updateWlUI();
+  
+  // Stagger card animations
+  document.querySelectorAll('.pcard').forEach((c,i)=>{
+    c.style.opacity='0';c.style.transform='translateY(14px)';
+    c.style.transition=`opacity .38s ease ${i*.06}s,transform .38s ease ${i*.06}s`;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{c.style.opacity='1';c.style.transform='translateY(0)';}));
+  });
+});
+</script>
+
+</body>
+</html>

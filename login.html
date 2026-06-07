@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LivEra - Join & Login</title>
+    <!-- CSS and Fonts -->
+    <link rel="stylesheet" href="assets/css/style.css?v=4">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body class="auth-page">
+    
+    <!-- Simplified Absolute Navbar -->
+    <nav class="auth-navbar">
+        <a href="index.html" class="nav-logo">
+            <div class="logo-icon"><i class="fas fa-home"></i></div>
+            <span class="logo-text">Liv<span class="logo-accent">Era</span></span>
+        </a>
+        <a href="index.html" class="btn btn-outline btn-sm auth-back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    </nav>
+
+    <div class="auth-split-layout">
+        <!-- Left Banner Side -->
+        <div class="auth-banner">
+            <div class="auth-banner-img"></div>
+            <div class="auth-banner-overlay"></div>
+            <div class="auth-banner-content">
+                <span class="section-tag" style="margin-bottom: 24px;">Welcome to LivEra</span>
+                <h1 class="auth-banner-title">Find Your Perfect Student Home.</h1>
+                <p class="auth-banner-subtitle">No brokers. No fake listing. Just verified spaces designed for focus and comfort around campus.</p>
+                
+                <div class="auth-features">
+                    <div class="auth-feature-item">
+                        <i class="fas fa-shield-halved"></i> <span>100% Verified Properties</span>
+                    </div>
+                    <div class="auth-feature-item">
+                        <i class="fas fa-indian-rupee-sign"></i> <span>Zero Brokerage Fees</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Form Side -->
+        <div class="auth-panel">
+            <!-- Glassmorphism Auth Form Wrapper -->
+            <div class="auth-wrapper" id="authWrapper">
+                <div class="glass-auth-container auth-anim-element">
+                    
+                    <!-- Auth Mode Toggle -->
+                    <div class="auth-mode-toggle">
+                        <button class="mode-btn active" id="btnSignup" onclick="setAuthMode('signup')">Sign Up</button>
+                        <button class="mode-btn" id="btnLogin" onclick="setAuthMode('login')">Log In</button>
+                    </div>
+
+                    <h2 class="auth-title" id="authTitle">Create an Account</h2>
+                    <p class="auth-submarine" id="authSub">Your gateway to premium housing near Loni Kalbhor</p>
+                    
+                    <form id="authForm" onsubmit="handleSignup(event)" class="auth-form">
+                        
+                        <div class="floating-input-group auth-anim-element">
+                            <input type="email" id="email" class="floating-input" placeholder=" " required />
+                            <label class="floating-label">Email Address</label>
+                            <div class="input-glow"></div>
+                        </div>
+
+                        <div class="floating-input-group auth-anim-element">
+                            <input type="password" id="password" class="floating-input" placeholder=" " required />
+                            <label class="floating-label">Password</label>
+                            <div class="input-glow"></div>
+                        </div>
+
+                        <div class="floating-input-group auth-anim-element" id="confirmPasswordGroup">
+                            <input type="password" id="confirmPassword" class="floating-input" placeholder=" " />
+                            <label class="floating-label">Confirm Password</label>
+                            <div class="input-glow"></div>
+                            <div id="passwordMismatch" style="color:#ef4444;font-size:.75rem;margin-top:4px;display:none;">Passwords do not match</div>
+                        </div>
+
+                        <div id="forgotPasswordLink" class="auth-anim-element" style="display:none;text-align:right;margin-top:-4px;margin-bottom:8px;">
+                            <a href="#" onclick="showForgotPassword(event)" style="color:var(--color-accent);font-size:.82rem;font-weight:500;text-decoration:none;">Forgot Password?</a>
+                        </div>
+
+                        <div class="auth-anim-element">
+                            <button type="submit" id="submitBtn" class="btn btn-primary auth-btn">
+                                Join LivEra <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <div class="auth-divider auth-anim-element">
+                            <span>or continue with</span>
+                        </div>
+
+                        <div class="auth-anim-element">
+                            <button type="button" class="btn btn-social" style="opacity:0.5;cursor:not-allowed;position:relative;overflow:visible;" disabled>
+                                <i class="fab fa-google"></i> <span id="googleBtnText">Sign up with Google</span>
+                                <span style="position:absolute;top:-10px;right:-10px;background:var(--color-accent);color:#0a0a0f;font-size:.65rem;font-weight:800;padding:4px 10px;border-radius:20px;text-transform:uppercase;box-shadow:0 4px 12px rgba(201,168,76,0.4);z-index:10;">Coming Soon</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Onboarding Screen (Role Selection) -->
+            <div class="auth-wrapper" id="onboardingScreen" style="display: none;">
+                <div class="glass-auth-container onboarding-container">
+                    <h2 class="auth-title" style="text-align: center;">Choose Your Path</h2>
+                    <p class="auth-submarine" style="text-align: center; margin-bottom: 40px;">Select how you want to use LivEra. You can always change this later in your settings.</p>
+                    
+                    <div class="role-selection-grid">
+                        <div class="role-card" onclick="selectRole('student')">
+                            <div class="role-icon"><i class="fas fa-user-graduate"></i></div>
+                            <h3>I am a Student</h3>
+                            <p>Looking for a PG, flat, or hostel near my campus.</p>
+                        </div>
+                        <div class="role-card" onclick="selectRole('lister')">
+                            <div class="role-icon"><i class="fas fa-house-chimney-window"></i></div>
+                            <h3>I am a Lister</h3>
+                            <p>Want to list and manage my property for students.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Entrance Animations & Logic Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.from('.auth-banner-content > *', {
+                y: 40,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.15,
+                ease: 'power3.out',
+                delay: 0.2
+            });
+
+            gsap.from('.auth-anim-element', {
+                y: 30,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: 'power3.out',
+                delay: 0.4
+            });
+        });
+
+        // UI toggling for Login vs Signup
+        let isLogin = false;
+        function setAuthMode(mode) {
+            isLogin = (mode === 'login');
+            
+            document.getElementById('btnSignup').classList.toggle('active', !isLogin);
+            document.getElementById('btnLogin').classList.toggle('active', isLogin);
+            
+            // Toggle confirm password visibility
+            document.getElementById('confirmPasswordGroup').style.display = isLogin ? 'none' : 'block';
+            document.getElementById('forgotPasswordLink').style.display = isLogin ? 'block' : 'none';
+            
+            if (isLogin) {
+                document.getElementById('authTitle').innerText = "Welcome Back";
+                document.getElementById('authSub').innerText = "Log in to access your properties and saved searches.";
+                document.getElementById('submitBtn').innerHTML = 'Log In <i class="fas fa-arrow-right"></i>';
+                document.getElementById('googleBtnText').innerText = "Log in with Google";
+                document.getElementById('authForm').setAttribute('onsubmit', 'handleLogin(event)');
+            } else {
+                document.getElementById('authTitle').innerText = "Create an Account";
+                document.getElementById('authSub').innerText = "Your gateway to premium housing near Loni Kalbhor";
+                document.getElementById('submitBtn').innerHTML = 'Join LivEra <i class="fas fa-arrow-right"></i>';
+                document.getElementById('googleBtnText').innerText = "Sign up with Google";
+                document.getElementById('authForm').setAttribute('onsubmit', 'handleSignup(event)');
+            }
+        }
+
+        function showForgotPassword(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                alert('Please enter your email address first, then click Forgot Password.');
+                document.getElementById('email').focus();
+                return;
+            }
+            alert('Password reset instructions have been sent to ' + email + '. Please check your inbox.');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Check if user exists in localStorage
+            const users = JSON.parse(localStorage.getItem('livera_users') || '{}');
+            if (users[email] && users[email].password === password) {
+                localStorage.setItem('user', JSON.stringify({ email: email, role: users[email].role }));
+                routeUser();
+            } else if (users[email]) {
+                alert('Incorrect password. Please try again.');
+            } else {
+                alert('No account found with this email. Please sign up first.');
+                setAuthMode('signup');
+            }
+        }
+    </script>
+    <script src="assets/js/auth.js"></script>
+</body>
+</html>

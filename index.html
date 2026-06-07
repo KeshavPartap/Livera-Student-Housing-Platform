@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="LivEra — Verified student housing near Loni Kalbhor, Pune. No brokers, no scams. Browse trusted rooms, check availability, and move in today.">
+    <title>LivEra — Verified Student Housing in Pune</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- GSAP & ScrollTrigger & Flip & ScrollTo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Flip.min.js" defer></script>
+
+    <!-- Vanilla-Tilt.js for 3D effect -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js" defer></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/style.css?v=5">
+    <script src="assets/js/script.js?v=5" defer></script>
+</head>
+
+<body>
+
+    <!-- ===== NAVIGATION ===== -->
+    <nav id="navbar" class="navbar">
+        <div class="nav-container">
+            <a href="#hero" class="nav-logo"><span class="logo-text"><span class="logo-accent">Liv</span>Era</span></a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#problem" class="nav-link">Why LivEra</a></li>
+                <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                <li><a href="#property-preview" class="nav-link">Properties</a></li>
+                <li><a href="#testimonials" class="nav-link">Reviews</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li><a href="login.html" class="nav-link" style="color: var(--color-accent); font-weight: 700;">Login / Join</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section id="hero" class="hero">
+        <div class="hero-bg" id="heroBgParallax">
+            <div class="hero-image-mask" id="heroImageMask">
+                <!-- Rotating Background Slideshow -->
+                <div class="hero-slideshow" id="heroSlideshow">
+                    <img src="assets/images/2.5_bhk_apartment-for-sale-loni_kalbhor-Pune-hall.avif" alt="Loni Kalbhor 2.5 BHK Apartment" class="hero-slide active" loading="eager">
+                    <img src="assets/images/619911903M-1767299241010.webp" alt="Premium Property View" class="hero-slide" loading="lazy">
+                    <img src="assets/images/717676465M-1771938199616.webp" alt="Modern Interior Space" class="hero-slide" loading="lazy">
+                    <img src="assets/images/83415677_1_PropertyImage370-2915161763991_470_1080.jpg" alt="Luxury Building View" class="hero-slide" loading="lazy">
+                </div>
+                <div class="hero-slide-progress">
+                    <span class="slide-dot active" data-slide="0"></span>
+                    <span class="slide-dot" data-slide="1"></span>
+                    <span class="slide-dot" data-slide="2"></span>
+                    <span class="slide-dot" data-slide="3"></span>
+                </div>
+            </div>
+            <div class="hero-overlay"></div>
+            <div class="hero-vignette"></div>
+            <div class="hero-grain"></div>
+        </div>
+        
+        <!-- Radial light gradient following cursor -->
+        <div class="cursor-light" id="cursorLight"></div>
+        
+        <!-- Floating Decorative Elements -->
+        <div class="hero-decorations" id="heroDecorations">
+            <div class="hero-line hero-line-1"></div>
+            <div class="hero-line hero-line-2"></div>
+            <div class="hero-dot hero-dot-1"></div>
+            <div class="hero-dot hero-dot-2"></div>
+        </div>
+
+        <div class="hero-content" id="heroContentParallax">
+            <div class="hero-badge" id="heroBadge">
+                <span class="hero-badge-dot"></span>
+                <span>Trusted by 500+ Students in Pune</span>
+            </div>
+            <!-- Text split manually for precise GSAP character animation -->
+            <h1 class="hero-title" id="heroTitle">
+                <span class="word">Verified</span> <span class="word">Housing</span><br>
+                <span class="text-accent word">Without</span> <span class="text-accent word">the</span> <span class="text-accent word">Hassle</span>
+            </h1>
+            <p class="hero-subtitle" id="heroSubtitle">No brokers. No fake listings. No wasted weekends. Find trusted, affordable housing near your campus in minutes.</p>
+            <div class="hero-buttons" id="heroButtons">
+                <a href="explore.html" class="btn btn-primary saas-btn-golden hero-btn">Find Your Home <i class="fas fa-arrow-right"></i></a>
+                <a href="#how-it-works" class="btn btn-outline hero-btn">See How It Works</a>
+            </div>
+        </div>
+        <div class="scroll-indicator" id="scrollIndicator">
+            <span class="scroll-text">Scroll to Explore</span>
+            <div class="scroll-arrow">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PROBLEM SECTION ===== -->
+    <section id="problem" class="section problem-section">
+        <div class="problem-bg-shapes">
+            <div class="shape shape-circle"></div>
+            <div class="shape shape-grid"></div>
+        </div>
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">The Problem</span>
+                <h2 class="section-title">Finding Student Housing is Broken</h2>
+                <p class="section-subtitle">Every year, thousands of students waste weeks dealing with these issues before they can even start studying.</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-card" data-reveal>
+                    <div class="problem-icon"><i class="fas fa-user-secret"></i></div>
+                    <h3>Broker Exploitation</h3>
+                    <p>Students pay ₹5,000–₹15,000 in broker fees for listings that are often misleading or unavailable. That's money that should go toward education.</p>
+                    <div class="problem-stat">
+                        <div class="problem-stat-bar">
+                            <div class="problem-stat-fill" data-width="78"></div>
+                        </div>
+                        <span class="problem-stat-label">78% students overpay due to brokers</span>
+                    </div>
+                </div>
+                <div class="problem-card" data-reveal>
+                    <div class="problem-icon"><i class="fas fa-ghost"></i></div>
+                    <h3>Fake Listings Everywhere</h3>
+                    <p>Photos don't match reality. Prices change on arrival. Properties are already rented. Students waste entire weekends visiting phantom listings.</p>
+                    <div class="problem-stat">
+                        <div class="problem-stat-bar">
+                            <div class="problem-stat-fill" data-width="64"></div>
+                        </div>
+                        <span class="problem-stat-label">64% listings are misleading or fake</span>
+                    </div>
+                </div>
+                <div class="problem-card" data-reveal>
+                    <div class="problem-icon"><i class="fas fa-clock"></i></div>
+                    <h3>Weeks of Wasted Time</h3>
+                    <p>The average student spends 2–3 weeks searching before move-in. That's time lost from orientation, classes, and settling into college life.</p>
+                    <div class="problem-stat">
+                        <div class="problem-stat-bar">
+                            <div class="problem-stat-fill" data-width="85"></div>
+                        </div>
+                        <span class="problem-stat-label">85% miss first week of classes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SOLUTION SECTION ===== -->
+    <section id="solution" class="section solution-section">
+        <div class="solution-bg-shapes">
+            <div class="shape shape-blob"></div>
+            <div class="shape shape-dots"></div>
+        </div>
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">The Solution</span>
+                <h2 class="section-title">LivEra Changes Everything</h2>
+                <p class="section-subtitle">A platform built specifically for students, by people who understand the struggle.</p>
+            </div>
+            <div class="solution-grid">
+                <div class="solution-card" data-reveal>
+                    <div class="solution-number">01</div>
+                    <div class="solution-icon"><i class="fas fa-shield-halved"></i></div>
+                    <h3>100% Verified Listings</h3>
+                    <p>Every property is physically verified by our team. Photos are real. Prices are locked. What you see is exactly what you get.</p>
+                    <div class="solution-metric">
+                        <div class="solution-metric-ring" data-percent="100">
+                            <svg viewBox="0 0 36 36" class="metric-svg">
+                                <path class="metric-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                <path class="metric-fill" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                            </svg>
+                            <span class="metric-value">100%</span>
+                        </div>
+                        <span class="solution-metric-label">Verification Rate</span>
+                    </div>
+                </div>
+                <div class="solution-card" data-reveal>
+                    <div class="solution-number">02</div>
+                    <div class="solution-icon"><i class="fas fa-hand-holding-dollar"></i></div>
+                    <h3>Zero Brokerage</h3>
+                    <p>Connect directly with property owners. No middlemen, no hidden fees. Save thousands on every rental.</p>
+                    <div class="solution-compare">
+                        <div class="compare-item compare-bad">
+                            <span class="compare-label">Traditional</span>
+                            <span class="compare-value">₹5,000–₹15,000</span>
+                        </div>
+                        <div class="compare-vs">vs</div>
+                        <div class="compare-item compare-good">
+                            <span class="compare-label">LivEra</span>
+                            <span class="compare-value">₹0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="solution-card" data-reveal>
+                    <div class="solution-number">03</div>
+                    <div class="solution-icon"><i class="fas fa-bolt"></i></div>
+                    <h3>Find a Home in 48 Hours</h3>
+                    <p>Smart filters, interactive maps, and instant booking. Most students find their perfect home within two days on LivEra.</p>
+                    <div class="solution-timeline">
+                        <div class="timeline-bar">
+                            <div class="timeline-fill" data-hours="48"></div>
+                        </div>
+                        <div class="timeline-labels">
+                            <span>Browse</span>
+                            <span>Visit</span>
+                            <span>Move In ✓</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS ===== -->
+    <section id="how-it-works" class="section how-it-works-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">How It Works</span>
+                <h2 class="section-title">Your Home in 4 Simple Steps</h2>
+            </div>
+            <div class="hiw-steps">
+                <div class="hiw-step" data-hiw-step>
+                    <div class="hiw-step-number">1</div>
+                    <div class="hiw-icon-wrap">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Search</h3>
+                    <p>Enter your college or area. Browse verified listings with real photos and transparent pricing.</p>
+                </div>
+                <div class="hiw-connector"><i class="fas fa-chevron-right"></i></div>
+                <div class="hiw-step" data-hiw-step>
+                    <div class="hiw-step-number">2</div>
+                    <div class="hiw-icon-wrap">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h3>Filter & Compare</h3>
+                    <p>Narrow down by price, type, amenities, and distance. Compare properties side by side on the map.</p>
+                </div>
+                <div class="hiw-connector"><i class="fas fa-chevron-right"></i></div>
+                <div class="hiw-step" data-hiw-step>
+                    <div class="hiw-step-number">3</div>
+                    <div class="hiw-icon-wrap">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3>Schedule Visit</h3>
+                    <p>Book a site visit directly through the platform. No phone tag with brokers — instant confirmation.</p>
+                </div>
+                <div class="hiw-connector"><i class="fas fa-chevron-right"></i></div>
+                <div class="hiw-step" data-hiw-step>
+                    <div class="hiw-step-number">4</div>
+                    <div class="hiw-icon-wrap">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h3>Move In</h3>
+                    <p>Sign directly with the owner. Zero brokerage fees. Move in and start your college life stress-free.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PROPERTY PREVIEW MODULE ===== -->
+    <section id="property-preview" class="section section-property-preview">
+        <div class="pp-bg-shapes">
+            <div class="pp-shape pp-shape-1"></div>
+            <div class="pp-shape pp-shape-2"></div>
+            <div class="pp-shape pp-shape-3"></div>
+        </div>
+        <div class="container">
+            <!-- Header -->
+            <div class="pp-header" id="ppHeader">
+                <span class="section-tag">Explore</span>
+                <h2 class="pp-headline">Featured Properties <span class="pp-accent">Near You</span></h2>
+                <p class="pp-desc">Explore curated premium listings with real photos. Find your perfect home in Loni Kalbhor, Pune.</p>
+            </div>
+            <!-- Glassmorphism Filter Bar -->
+            <div class="glass-filter-bar" id="ppFilters">
+                <div class="glass-filter-group">
+                    <label for="filter-type">Type</label>
+                    <select id="filter-type" class="glass-select">
+                        <option value="all">Any Type</option>
+                        <option value="Apartment">Apartment</option>
+                        <option value="Flat">Flat</option>
+                        <option value="Pg">PG</option>
+                        <option value="Co living">Co-Living</option>
+                    </select>
+                </div>
+                <div class="glass-filter-group">
+                    <label for="filter-price">Price</label>
+                    <select id="filter-price" class="glass-select">
+                        <option value="all">Any Price</option>
+                        <option value="5-10">₹5k – ₹10k</option>
+                        <option value="10-15">₹10k – ₹15k</option>
+                        <option value="15-20">₹15k – ₹20k</option>
+                        <option value="20+">₹20k+</option>
+                    </select>
+                </div>
+                <div class="glass-filter-group">
+                    <label for="filter-beds">Beds</label>
+                    <select id="filter-beds" class="glass-select">
+                        <option value="all">Any Beds</option>
+                        <option value="1">1 BHK</option>
+                        <option value="2">2 BHK</option>
+                        <option value="3">3 BHK</option>
+                        <option value="4+">4+ BHK</option>
+                    </select>
+                </div>
+                <div class="glass-filter-group">
+                    <label for="filter-location">Location</label>
+                    <select id="filter-location" class="glass-select">
+                        <option value="all">Any Location</option>
+                        <option value="Loni Kalbhor">Loni Kalbhor</option>
+                        <option value="Hadapsar">Hadapsar</option>
+                        <option value="Kharadi">Kharadi</option>
+                        <option value="Wagholi">Wagholi</option>
+                    </select>
+                </div>
+            </div>
+            <!-- No Results Message -->
+            <div class="pp-no-results" id="ppNoResults" style="display: none;">
+                <i class="fas fa-search"></i>
+                <p>No properties match your filters. Try adjusting your criteria.</p>
+                <button class="btn btn-outline" onclick="resetPropertyFilters()">Reset Filters</button>
+            </div>
+            <!-- Floating Property Cards -->
+            <div class="pp-floating-area" id="ppFloatingArea">
+                <div class="pp-property-card premium-prop-card" data-pp-card="0" data-type="PG" data-price="8500" data-beds="1" data-location="Loni Kalbhor">
+                    <img src="assets/listings/dx.jpeg" onerror="this.src='images/room-1.png'" alt="Agastyas PG" loading="lazy">
+                    <div class="premium-prop-head">
+                        <div class="premium-prop-price">₹8,500 <span>/ month</span></div>
+                    </div>
+                    <div class="premium-prop-location">📍 Agastyas PG, Loni Kalbhor</div>
+                    <div class="premium-prop-footer">
+                        <span class="premium-verified">✔ Verified</span>
+                        <a href="property-detail.html?id=0" class="premium-view-btn">View Details</a>
+                    </div>
+                </div>
+                <div class="pp-property-card premium-prop-card" data-pp-card="1" data-type="PG" data-price="10500" data-beds="1" data-location="Loni Kalbhor">
+                    <img src="assets/listings/img1.jpeg" onerror="this.src='3.jpg'" alt="Zolo Noble" loading="lazy">
+                    <div class="premium-prop-head">
+                        <div class="premium-prop-price">₹10,500 <span>/ month</span></div>
+                    </div>
+                    <div class="premium-prop-location">📍 Zolo Noble, Loni Kalbhor</div>
+                    <div class="premium-prop-footer">
+                        <span class="premium-verified">✔ Verified</span>
+                        <a href="property-detail.html?id=1" class="premium-view-btn">View Details</a>
+                    </div>
+                </div>
+                <div class="pp-property-card premium-prop-card" data-pp-card="2" data-type="Hostel" data-price="9500" data-beds="1" data-location="Loni Kalbhor">
+                    <img src="assets/listings/jhb.jpeg" onerror="this.src='images/room-2.png'" alt="H25 Premium Stay Boys PG" loading="lazy">
+                    <div class="premium-prop-head">
+                        <div class="premium-prop-price">₹9,500 <span>/ month</span></div>
+                    </div>
+                    <div class="premium-prop-location">📍 H25 Premium Stay, Chintamani Park</div>
+                    <div class="premium-prop-footer">
+                        <span class="premium-verified">✔ Verified</span>
+                        <a href="property-detail.html?id=2" class="premium-view-btn">View Details</a>
+                    </div>
+                </div>
+                <div class="pp-property-card premium-prop-card" data-pp-card="3" data-type="Hostel" data-price="11000" data-beds="2" data-location="Loni Kalbhor">
+                    <img src="assets/listings/img2.jpeg" onerror="this.src='images/room-4.png'" alt="Luxury Girls & Boys Hostel" loading="lazy">
+                    <div class="premium-prop-head">
+                        <div class="premium-prop-price">₹11,000 <span>/ month</span></div>
+                    </div>
+                    <div class="premium-prop-location">📍 Luxury Girls & Boys Hostel PG</div>
+                    <div class="premium-prop-footer">
+                        <span class="premium-verified">✔ Verified</span>
+                        <a href="property-detail.html?id=4" class="premium-view-btn">View Details</a>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 48px;">
+                <a href="explore.html" class="btn btn-outline btn-lg">View All Properties <i class="fas fa-arrow-right" style="margin-left:8px;"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== STUDENT AMENITIES ===== -->
+    <section id="student-living" class="section section-amenities">
+        <div class="amenities-bg-particles" id="amenitiesParticles"></div>
+        <div class="amenities-bg-blobs">
+            <div class="amenities-blob amenities-blob-1"></div>
+            <div class="amenities-blob amenities-blob-2"></div>
+        </div>
+        <div class="container">
+            <div class="amenities-header" id="amenitiesHeader">
+                <span class="section-tag">Amenities</span>
+                <h2 class="amenities-title">Everything You Need for <span class="amenities-accent">Student Living</span></h2>
+                <p class="amenities-subtitle">Modern amenities designed to make student life comfortable, productive, and stress-free.</p>
+            </div>
+            <div class="amenities-grid" id="amenitiesGrid">
+                <div class="amenity-card" data-amenity-tilt>
+                    <div class="amenity-icon-wrap">
+                        <div class="amenity-icon-anim amenity-wifi-anim"><i class="fas fa-wifi"></i></div>
+                    </div>
+                    <h3 class="amenity-card-title">Blazing Fast Wi-Fi</h3>
+                    <p class="amenity-card-desc">High-speed internet included for seamless streaming and late-night studying.</p>
+                    <div class="amenity-glow"></div>
+                </div>
+                <div class="amenity-card" data-amenity-tilt>
+                    <div class="amenity-icon-wrap">
+                        <div class="amenity-icon-anim amenity-book-anim"><i class="fas fa-book-open"></i></div>
+                    </div>
+                    <h3 class="amenity-card-title">Study Lounges</h3>
+                    <p class="amenity-card-desc">Quiet co-working spaces designed to help you stay focused during exams.</p>
+                    <div class="amenity-glow"></div>
+                </div>
+                <div class="amenity-card" data-amenity-tilt>
+                    <div class="amenity-icon-wrap">
+                        <div class="amenity-icon-anim amenity-bed-anim"><i class="fas fa-couch"></i></div>
+                    </div>
+                    <h3 class="amenity-card-title">Fully Furnished</h3>
+                    <p class="amenity-card-desc">Move-in ready apartments with modern furniture and essential appliances.</p>
+                    <div class="amenity-glow"></div>
+                </div>
+                <div class="amenity-card" data-amenity-tilt>
+                    <div class="amenity-icon-wrap">
+                        <div class="amenity-icon-anim amenity-bolt-anim"><i class="fas fa-bolt"></i></div>
+                    </div>
+                    <h3 class="amenity-card-title">All-Inclusive Bills</h3>
+                    <p class="amenity-card-desc">Water, electricity, and utilities included in one flat monthly rate.</p>
+                    <div class="amenity-glow"></div>
+                </div>
+                <div class="amenity-card" data-amenity-tilt>
+                    <div class="amenity-icon-wrap">
+                        <div class="amenity-icon-anim amenity-shield-anim"><i class="fas fa-shield-halved"></i></div>
+                    </div>
+                    <h3 class="amenity-card-title">Secure Access</h3>
+                    <p class="amenity-card-desc">24/7 security with smart-lock entry and monitored building access.</p>
+                    <div class="amenity-glow"></div>
+                </div>
+                <div class="amenity-card" data-amenity-tilt>
+                    <div class="amenity-icon-wrap">
+                        <div class="amenity-icon-anim amenity-laundry-anim"><i class="fas fa-fan"></i></div>
+                    </div>
+                    <h3 class="amenity-card-title">On-Site Laundry</h3>
+                    <p class="amenity-card-desc">Convenient laundry facilities available inside the building.</p>
+                    <div class="amenity-glow"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS SECTION ===== -->
+    <section id="testimonials" class="section testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Reviews</span>
+                <h2 class="section-title">What Students Are Saying</h2>
+                <p class="section-subtitle">Real feedback from students who found their homes through LivEra.</p>
+                <!-- Aggregate Rating -->
+                <div class="aggregate-rating">
+                    <div class="aggregate-score">4.8</div>
+                    <div class="aggregate-details">
+                        <div class="aggregate-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="aggregate-count">Based on 50+ student reviews</span>
+                    </div>
+                    <div class="rating-bars">
+                        <div class="rating-bar-row"><span>5★</span><div class="rating-bar-track"><div class="rating-bar-fill" data-width="82"></div></div><span>82%</span></div>
+                        <div class="rating-bar-row"><span>4★</span><div class="rating-bar-track"><div class="rating-bar-fill" data-width="12"></div></div><span>12%</span></div>
+                        <div class="rating-bar-row"><span>3★</span><div class="rating-bar-track"><div class="rating-bar-fill" data-width="4"></div></div><span>4%</span></div>
+                        <div class="rating-bar-row"><span>2★</span><div class="rating-bar-track"><div class="rating-bar-fill" data-width="1"></div></div><span>1%</span></div>
+                        <div class="rating-bar-row"><span>1★</span><div class="rating-bar-track"><div class="rating-bar-fill" data-width="1"></div></div><span>1%</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card" data-reveal>
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"I was so stressed about finding a PG near campus. LivEra showed me 6 verified options within 1 km, and I moved in within 3 days. No broker fees — I saved ₹8,000 easily."</p>
+                    <div class="testimonial-author">
+                        <img src="assets/images/1.jpeg" alt="Aarav Kumar" class="testimonial-avatar-img">
+                        <div class="testimonial-info">
+                            <h4>Aarav Kumar</h4>
+                            <span>B.Tech, 2nd Year • Moved to Loni Kalbhor</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-helpful">
+                        <button class="helpful-btn" onclick="this.classList.toggle('liked')">
+                            <i class="far fa-thumbs-up"></i> Helpful <span class="helpful-count">24</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="testimonial-card testimonial-featured" data-reveal>
+                    <div class="testimonial-badge">Most Helpful</div>
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">"The map feature is a lifesaver. I could see exactly how far each flat was from college. The photos matched perfectly when I visited — no surprises. This is how renting should work."</p>
+                    <div class="testimonial-author">
+                        <img src="assets/images/PIC.jpg" alt="Sneha Mishra" class="testimonial-avatar-img">
+                        <div class="testimonial-info">
+                            <h4>Sneha Mishra</h4>
+                            <span>MBA, 1st Year • Moved to Hadapsar</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-helpful">
+                        <button class="helpful-btn" onclick="this.classList.toggle('liked')">
+                            <i class="far fa-thumbs-up"></i> Helpful <span class="helpful-count">47</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="testimonial-card" data-reveal>
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="testimonial-text">"My parents were worried about safety. The verified badge, owner details, and the fact that we could schedule a visit online gave them total peace of mind. Highly recommend."</p>
+                    <div class="testimonial-author">
+                        <img src="assets/images/building.jpg" alt="Rohan Patil" class="testimonial-avatar-img">
+                        <div class="testimonial-info">
+                            <h4>Rohan Patil</h4>
+                            <span>B.Sc, 1st Year • Moved to Kharadi</span>
+                        </div>
+                    </div>
+                    <div class="testimonial-helpful">
+                        <button class="helpful-btn" onclick="this.classList.toggle('liked')">
+                            <i class="far fa-thumbs-up"></i> Helpful <span class="helpful-count">19</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TRUST SECTION ===== -->
+    <section id="trust" class="section trust-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Trust</span>
+                <h2 class="section-title" style="text-align: center;">Built on Transparency</h2>
+                <p class="section-subtitle">Every listing goes through our rigorous 5-point verification process.</p>
+            </div>
+            <div class="trust-stats">
+                <div class="trust-stat" data-reveal>
+                    <span class="trust-number" data-count="50">0</span>
+                    <span class="trust-suffix">+</span>
+                    <span class="trust-label">Students Housed</span>
+                </div>
+                <div class="trust-stat" data-reveal>
+                    <span class="trust-number" data-count="5">0</span>
+                    <span class="trust-suffix">+</span>
+                    <span class="trust-label">Verified Properties</span>
+                </div>
+                <div class="trust-stat" data-reveal>
+                    <span class="trust-number" data-count="100">0</span>
+                    <span class="trust-suffix">%</span>
+                    <span class="trust-label">Owner Verified</span>
+                </div>
+                <div class="trust-stat" data-reveal>
+                    <span class="trust-number" data-count="0">0</span>
+                    <span class="trust-suffix">₹</span>
+                    <span class="trust-label">Brokerage Charged</span>
+                </div>
+            </div>
+            <!-- Verification Process Timeline -->
+            <div class="verification-timeline">
+                <h3 class="verification-title">Our 5-Point Verification</h3>
+                <div class="v-timeline">
+                    <div class="v-step" data-reveal>
+                        <div class="v-step-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="v-step-content">
+                            <h4>Location Confirmed</h4>
+                            <p>We verify the exact address and neighborhood safety.</p>
+                        </div>
+                    </div>
+                    <div class="v-step" data-reveal>
+                        <div class="v-step-icon"><i class="fas fa-camera"></i></div>
+                        <div class="v-step-content">
+                            <h4>Photos Validated</h4>
+                            <p>Our team takes real photos on-site — no stock images.</p>
+                        </div>
+                    </div>
+                    <div class="v-step" data-reveal>
+                        <div class="v-step-icon"><i class="fas fa-user-check"></i></div>
+                        <div class="v-step-content">
+                            <h4>Owner Identity</h4>
+                            <p>Landlord ID and ownership documents verified.</p>
+                        </div>
+                    </div>
+                    <div class="v-step" data-reveal>
+                        <div class="v-step-icon"><i class="fas fa-rupee-sign"></i></div>
+                        <div class="v-step-content">
+                            <h4>Price Locked</h4>
+                            <p>Rent is confirmed and locked — no surprise changes.</p>
+                        </div>
+                    </div>
+                    <div class="v-step" data-reveal>
+                        <div class="v-step-icon"><i class="fas fa-check-double"></i></div>
+                        <div class="v-step-content">
+                            <h4>Quality Checked</h4>
+                            <p>Amenities, safety features, and condition fully inspected.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="trust-badges">
+                <div class="trust-badge-item"><i class="fas fa-shield-halved"></i> Physically Verified</div>
+                <div class="trust-badge-item"><i class="fas fa-camera"></i> Real Photos Only</div>
+                <div class="trust-badge-item"><i class="fas fa-lock"></i> Secure Booking</div>
+                <div class="trust-badge-item"><i class="fas fa-headset"></i> Student Support</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CONTACT SECTION ===== -->
+    <section id="contact" class="section contact-section">
+        <div class="container">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <span class="section-tag">Get in Touch</span>
+                    <h2 class="section-title">Have Questions?<br>We're Here to Help.</h2>
+                    <p class="section-desc">Whether you're looking for a room, have feedback, or want to list your property — reach out to us.</p>
+                    <div class="contact-details">
+                        <div class="contact-detail-item">
+                            <div class="contact-detail-icon"><i class="fas fa-map-marker-alt"></i></div>
+                            <div>
+                                <h4>Visit Us</h4>
+                                <p>Near Loni Kalbhor Station,<br>Pune, Maharashtra 412201</p>
+                            </div>
+                        </div>
+                        <div class="contact-detail-item">
+                            <div class="contact-detail-icon"><i class="fas fa-phone"></i></div>
+                            <div>
+                                <h4>Call Us</h4>
+                                <p>+91 7037261848</p>
+                            </div>
+                        </div>
+                        <div class="contact-detail-item">
+                            <div class="contact-detail-icon"><i class="fas fa-envelope"></i></div>
+                            <div>
+                                <h4>Email Us</h4>
+                                <p>priyanshuu9819@gmail.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form-wrap">
+                    <form id="contactForm" class="contact-form" onsubmit="event.preventDefault(); window.open(`https://wa.me/917037261848?text=${encodeURIComponent('Hello LivEra Team!\n\nName: ' + document.getElementById('contactName').value + '\nEmail: ' + document.getElementById('contactEmail').value + '\nSubject: ' + document.getElementById('contactSubject').options[document.getElementById('contactSubject').selectedIndex].text + '\n\nMessage:\n' + document.getElementById('contactMessage').value)}`, '_blank');">
+                        <h3>Send us a message</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contactName">Full Name</label>
+                                <input type="text" id="contactName" placeholder="Your name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contactEmail">Email</label>
+                                <input type="email" id="contactEmail" placeholder="you@email.com" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactSubject">Subject</label>
+                            <select id="contactSubject" required>
+                                <option value="">Choose a topic</option>
+                                <option value="housing">Looking for Housing</option>
+                                <option value="listing">Want to List Property</option>
+                                <option value="support">Support / Issue</option>
+                                <option value="feedback">Feedback</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactMessage">Message</label>
+                            <textarea id="contactMessage" placeholder="Tell us what you need..." rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary saas-btn-golden" style="width:100%;">
+                            Send Message <i class="fas fa-paper-plane" style="margin-left:8px;"></i>
+                        </button>
+                        <div class="form-success" id="formSuccess" style="display:none;">
+                            <i class="fas fa-check-circle"></i>
+                            <p>Message sent! We'll get back to you within 24 hours.</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA SECTION ===== -->
+    <section id="cta" class="section cta">
+        <div class="cta-bg"></div>
+        <div class="container cta-content">
+            <span class="section-tag" style="color: var(--color-text-muted); font-size: 0.85rem; letter-spacing: 2px;">Ready?</span>
+            <h2 class="cta-title" id="ctaTitle" style="color: var(--color-text);">Stop Searching. Start Living.</h2>
+            <p class="cta-subtitle">Join 50+ students who found their perfect home through LivEra — in less than a week.</p>
+            <div class="cta-buttons">
+                <a href="explore.html" class="btn btn-primary btn-lg saas-btn-golden">Browse Properties <i class="fas fa-arrow-right" style="margin-left:8px;"></i></a>
+                <a href="#contact" class="btn btn-outline btn-lg">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="#hero" class="nav-logo footer-logo">
+                        <span class="logo-text"><span class="logo-accent">Liv</span>Era</span>
+                    </a>
+                    <p class="footer-desc">Verified student housing near Loni Kalbhor, Pune. Your home away from home — comfortable, safe, and affordable.</p>
+                    <div class="social-links">
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#hero">Home</a></li>
+                        <li><a href="#problem">Why LivEra</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#property-preview">Properties</a></li>
+                        <li><a href="#testimonials">Reviews</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="explore.html">Explore Listings</a></li>
+                        <li><a href="login.html">Login / Sign Up</a></li>
+                        <li><a href="#contact">Contact Support</a></li>
+                        <li><a href="#contact">List Your Property</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Near Loni Kalbhor Station,<br>Pune, Maharashtra 412201</li>
+                        <li><i class="fas fa-phone"></i> +91 7037261848</li>
+                        <li><i class="fas fa-envelope"></i> priyanshuu9819@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 LivEra. All rights reserved. | <a href="privacy.html" style="color: var(--color-text-dim);">Privacy Policy</a> · <a href="terms.html" style="color: var(--color-text-dim);">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+
+</body>
+
+</html>

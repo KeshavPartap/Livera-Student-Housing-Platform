@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Premium student housing near Loni Kalbhor, Loni Kalbhor, Pune.">
+    <title>Property Detail | LivEra</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/property-detail.css">
+
+    <style>
+    /* Schedule Visit Modal */
+    .sv-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+    .sv-overlay.active{display:flex;}
+    .sv-modal{background:var(--color-surface,#16161f);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:32px;width:min(440px,92vw);position:relative;box-shadow:0 24px 64px rgba(0,0,0,.4);animation:svIn .3s ease;}
+    @keyframes svIn{from{opacity:0;transform:translateY(20px) scale(.96);}to{opacity:1;transform:translateY(0) scale(1);}}
+    .sv-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;width:32px;height:32px;color:#8b8ba0;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+    .sv-close:hover{color:#c9a84c;border-color:#c9a84c;}
+    .sv-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:#eaeaf0;margin-bottom:4px;}
+    .sv-sub{font-size:.82rem;color:#5a5a72;margin-bottom:24px;}
+    .sv-group{margin-bottom:16px;}
+    .sv-label{display:block;font-size:.75rem;font-weight:600;color:#c9a84c;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+    .sv-input{width:100%;padding:12px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#eaeaf0;font-family:'Inter',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;}
+    .sv-input:focus{border-color:#c9a84c;}
+    .sv-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .sv-submit{width:100%;padding:14px;background:#c9a84c;border:none;border-radius:10px;color:#0a0a0f;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:8px;}
+    .sv-submit:hover{background:#e0c56e;transform:translateY(-1px);}
+    .sv-success{display:none;text-align:center;padding:30px 20px;}
+    .sv-success i{font-size:2.5rem;color:#c9a84c;margin-bottom:14px;display:block;}
+    .sv-success h3{font-size:1.1rem;color:#eaeaf0;margin-bottom:6px;}
+    .sv-success p{font-size:.82rem;color:#8b8ba0;line-height:1.6;}
+
+    /* Toast */
+    .pd-toast{position:fixed;bottom:28px;right:28px;background:#16161f;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 20px;font-size:.85rem;color:#eaeaf0;box-shadow:0 12px 40px rgba(0,0,0,.3);z-index:10000;display:none;align-items:center;gap:10px;animation:svIn .3s ease;}
+    .pd-toast i{color:#c9a84c;}
+
+    /* Direction button in map */
+    .pd-dir-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:#c9a84c;border:none;border-radius:10px;color:#0a0a0f;font-family:'Inter',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none;}
+    .pd-dir-btn:hover{background:#e0c56e;transform:translateY(-2px);}
+    </style>
+</head>
+
+<body class="pd-page">
+
+    <!-- ===== NAVIGATION ===== -->
+    <nav id="navbar" class="navbar pd-navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo"><span class="logo-text"><span class="logo-accent">Liv</span>Era</span></a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="explore.html" class="nav-link">Explore</a></li>
+                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ===== TOP: HERO IMAGE GALLERY ===== -->
+    <section class="pd-gallery-section pt-navbar">
+        <div class="container pd-container">
+            <div class="pd-gallery-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="pd-gallery-main" id="galleryBtnMain" style="border-radius: 20px 0 0 20px;">
+                    <img id="mainImg" src="assets/images/property-exterior.png" alt="Property Main View">
+                </div>
+                <div class="pd-gallery-side" style="grid-template-columns: 1fr; grid-template-rows: 1fr;">
+                    <div class="pd-gallery-item position-relative" id="galleryBtn1" style="border-radius: 0 20px 20px 0;">
+                        <img id="sideImg1" src="assets/images/property-livingroom.png" alt="Property Interior">
+                        <button class="pd-view-all-btn"><i class="fas fa-th"></i> View Photos</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FULLSCREEN GALLERY ===== -->
+    <div class="fs-gallery-overlay" id="fsGalleryOverlay">
+        <button class="fs-gallery-close" id="fsGalleryClose"><i class="fas fa-times"></i></button>
+        <button class="fs-gallery-nav fs-prev" id="fsPrev"><i class="fas fa-chevron-left"></i></button>
+        <div class="fs-gallery-view">
+            <img src="assets/images/property-exterior.png" id="fsGalleryImage" alt="Fullscreen Property Image">
+            <div class="fs-gallery-counter"><span id="fsCurrentIndex">1</span> / <span id="fsTotalImages">5</span></div>
+        </div>
+        <button class="fs-gallery-nav fs-next" id="fsNext"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <!-- ===== MAIN CONTENT & STICKY SIDEBAR ===== -->
+    <section class="pd-content-section">
+        <div class="container pd-container pd-two-columns">
+
+            <!-- LEFT: MAIN INFO -->
+            <div class="pd-main-col">
+
+                <div class="pd-header-info pd-block">
+                    <div class="pd-badges">
+                        <span class="pd-badge pd-badge-verified"><i class="fas fa-shield-check"></i> Verified Property</span>
+                        <span class="pd-badge pd-badge-type" id="pdType">Apartment</span>
+                    </div>
+                    <h1 class="pd-title" id="pdTitle">Modern Fully Furnished 1RK Apartment</h1>
+                    <div class="pd-location"><i class="fas fa-location-dot"></i> <span id="pdLocation">Loni Kalbhor, Pune</span> &bull; <a href="#map" class="pd-map-link">View on Map</a></div>
+
+                    <div class="pd-quick-info" id="pdQuickInfo">
+                        <div class="pd-qi-item"><i class="fas fa-bed"></i><span>1 RK</span></div>
+                        <div class="pd-qi-item"><i class="fas fa-bath"></i><span>1 Bath</span></div>
+                        <div class="pd-qi-item"><i class="fas fa-ruler-combined"></i><span>650 sqft</span></div>
+                        <div class="pd-qi-item"><i class="fas fa-couch"></i><span>Fully Furnished</span></div>
+                        <div class="pd-qi-item"><i class="fas fa-building"></i><span>2nd Floor</span></div>
+                    </div>
+                </div>
+
+                <hr class="pd-divider">
+
+                <div class="pd-description pd-block">
+                    <h3 class="pd-section-title">About this property</h3>
+                    <p id="pdDesc1">This modern apartment offers a highly efficient living space with elegant interiors and a peaceful residential environment. Optimized for comfort and utility, it comes fully furnished with a bed, study desk, and essential appliances.</p>
+                    <p id="pdDesc2">Located near Loni Kalbhor and major transport hubs, it provides the perfect balance between comfort and convenience for students and young professionals.</p>
+                </div>
+
+                <hr class="pd-divider">
+
+                <div class="pd-amenities pd-block">
+                    <h3 class="pd-section-title">Amenities</h3>
+                    <div class="pd-amenities-grid" id="pdAmenities">
+                        <div class="pd-am-item"><i class="fas fa-wifi"></i> High-Speed Wi-Fi</div>
+                        <div class="pd-am-item"><i class="fas fa-snowflake"></i> Air Conditioning</div>
+                        <div class="pd-am-item"><i class="fas fa-couch"></i> Fully Furnished</div>
+                        <div class="pd-am-item"><i class="fas fa-shield-alt"></i> 24/7 Security</div>
+                        <div class="pd-am-item"><i class="fas fa-bolt"></i> Power Backup</div>
+                        <div class="pd-am-item"><i class="fas fa-jug-detergent"></i> Laundry Facilities</div>
+                        <div class="pd-am-item"><i class="fas fa-car"></i> Parking Available</div>
+                        <div class="pd-am-item"><i class="fas fa-utensils"></i> Mini Fridge</div>
+                    </div>
+                </div>
+
+                <hr class="pd-divider">
+
+                <div class="pd-features pd-block">
+                    <h3 class="pd-section-title">Key Features</h3>
+                    <div class="pd-features-chips" id="pdFeatures">
+                        <div class="pd-chip">Modular Kitchen</div>
+                        <div class="pd-chip">Balcony with View</div>
+                        <div class="pd-chip">Large Windows</div>
+                        <div class="pd-chip">Smart Lock Entry</div>
+                        <div class="pd-chip">Elevator Access</div>
+                        <div class="pd-chip">Nearby Grocery</div>
+                    </div>
+                </div>
+
+                <hr class="pd-divider">
+
+                <!-- Map Section -->
+                <div id="map" class="pd-map pd-block">
+                    <h3 class="pd-section-title">Location</h3>
+                    <div class="pd-map-container" style="border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.06);">
+                        <iframe id="pdMapFrame" width="100%" height="350" style="border:0;filter:invert(90%) hue-rotate(180deg);" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3784.5!2d73.988!3d18.4545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTjCsDI3JzE2LjIiTiA3M8KwNTknMTYuOCJF!5e0!3m2!1sen!2sin!4v1">
+                        </iframe>
+                    </div>
+                    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+                        <a id="pdDirBtn" href="#" target="_blank" class="pd-dir-btn"><i class="fas fa-directions"></i> Get Directions</a>
+                        <a id="pdMapsBtn" href="#" target="_blank" class="pd-dir-btn" style="background:transparent;border:1px solid rgba(201,168,76,.3);color:#c9a84c;"><i class="fas fa-map-marked-alt"></i> Open in Google Maps</a>
+                    </div>
+                    <div class="pd-poi-list" id="pdPOI">
+                        <div class="pd-poi"><i class="fas fa-graduation-cap"></i> <span>Loni Kalbhor</span> <small>1.2 km</small></div>
+                        <div class="pd-poi"><i class="fas fa-bus"></i> <span>Loni Station Bus Stop</span> <small>0.4 km</small></div>
+                        <div class="pd-poi"><i class="fas fa-shopping-cart"></i> <span>D-Mart Supermarket</span> <small>1.0 km</small></div>
+                        <div class="pd-poi"><i class="fas fa-hospital"></i> <span>Vishwaraj Hospital</span> <small>2.5 km</small></div>
+                    </div>
+                </div>
+
+                <hr class="pd-divider">
+
+                <!-- Reviews -->
+                <div class="pd-reviews pd-block">
+                    <h3 class="pd-section-title">Tenant Reviews <span class="pd-review-score"><i class="fas fa-star"></i> 4.8 (12)</span></h3>
+                    <div class="pd-review-list">
+                        <div class="pd-review-card">
+                            <div class="pd-reviewer">
+                                <div class="pd-avatar">AK</div>
+                                <div class="pd-rev-info"><h4>Aarav Kumar</h4><div class="pd-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div></div>
+                            </div>
+                            <p class="pd-rev-text">"Great location and very comfortable apartment. The Wi-Fi is super fast which helped tremendously during exams. The landlord is very responsive."</p>
+                        </div>
+                        <div class="pd-review-card">
+                            <div class="pd-reviewer">
+                                <div class="pd-avatar">SM</div>
+                                <div class="pd-rev-info"><h4>Sneha Mishra</h4><div class="pd-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div></div>
+                            </div>
+                            <p class="pd-rev-text">"Really secure and peaceful environment. The smart lock entry makes it very convenient. Grocery stores are just a 2-minute walk away."</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT: STICKY SIDEBAR -->
+            <div class="pd-side-col">
+                <div class="pd-sticky-booking">
+                    <div class="pd-sb-header">
+                        <div class="pd-sb-price">
+                            <span class="pd-price-val" id="pdPrice">₹10k</span>
+                            <span class="pd-price-period">/month</span>
+                        </div>
+                        <div class="pd-sb-deposit" id="pdDeposit">Deposit: ₹20,000</div>
+                    </div>
+
+                    <div class="pd-sb-actions">
+                        <button class="pd-btn pd-btn-primary pd-btn-block" id="scheduleVisitBtn"><i class="fas fa-calendar-check"></i> Schedule Visit</button>
+                        <a id="pdDirBtn2" href="#" target="_blank" class="pd-btn pd-btn-secondary pd-btn-block" style="text-align:center;text-decoration:none;"><i class="fas fa-directions"></i> Get Directions</a>
+                    </div>
+
+                    <div class="pd-sb-trust">
+                        <div class="pd-trust-item"><i class="fas fa-check-circle"></i> Owner Verified</div>
+                        <div class="pd-trust-item"><i class="fas fa-bolt"></i> Instant Booking</div>
+                        <div class="pd-trust-item"><i class="fas fa-shield-alt"></i> Secure Payments</div>
+                    </div>
+
+                    <hr class="pd-sb-divider">
+
+                    <form class="pd-inquiry-form" id="inquiryForm">
+                        <h4 class="pd-form-title">Contact Landlord</h4>
+                        <div class="pd-form-group"><input type="text" placeholder="Your Name" required class="pd-input" id="iqName"></div>
+                        <div class="pd-form-group"><input type="tel" placeholder="Phone Number" required class="pd-input" id="iqPhone"></div>
+                        <div class="pd-form-group"><textarea placeholder="Hi, I am interested in this property..." required class="pd-textarea" id="iqMsg"></textarea></div>
+                        <button type="submit" class="pd-btn pd-btn-outline pd-btn-block">Send Inquiry</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== SIMILAR LISTINGS ===== -->
+    <section class="pd-similar-section">
+        <div class="container pd-container">
+            <h2 class="pd-section-title">Similar Properties You May Like</h2>
+            <div class="pd-similar-grid" id="pdSimilar"></div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer id="contact" class="footer pd-footer">
+        <div class="container pd-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="nav-logo footer-logo">
+                        <span class="logo-text">Liv<span class="logo-accent">Era</span></span>
+                    </a>
+                    <p class="footer-desc">Premium student housing near Loni Kalbhor. Your home away from home.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="explore.html">Explore</a></li>
+                        <li><a href="index.html#features">Amenities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Address</h4>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Loni Kalbhor, Pune, Maharashtra</li>
+                        <li><i class="fas fa-phone"></i> +91 7037261848</li>
+                        <li><i class="fas fa-envelope"></i> priyanshuu9819@gmail.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 LivEra. All rights reserved. | <a href="privacy.html" style="color: var(--color-text-dim);">Privacy Policy</a> · <a href="terms.html" style="color: var(--color-text-dim);">Terms of Service</a></p></div>
+        </div>
+    </footer>
+
+    <!-- ===== SCHEDULE VISIT MODAL ===== -->
+    <div class="sv-overlay" id="svOverlay">
+        <div class="sv-modal">
+            <button class="sv-close" id="svClose"><i class="fas fa-times"></i></button>
+
+            <!-- Form View -->
+            <div id="svForm">
+                <h2 class="sv-title"><i class="fas fa-calendar-check" style="color:#c9a84c;margin-right:8px;"></i> Schedule a Visit</h2>
+                <p class="sv-sub" id="svPropName">for Modern Fully Furnished 1RK Apartment</p>
+
+                <div class="sv-group">
+                    <label class="sv-label">Your Name</label>
+                    <input type="text" class="sv-input" id="svName" placeholder="Enter your full name" required>
+                </div>
+                <div class="sv-group">
+                    <label class="sv-label">Phone Number</label>
+                    <input type="tel" class="sv-input" id="svPhone" placeholder="+91 98765 43210" required>
+                </div>
+                <div class="sv-row">
+                    <div class="sv-group">
+                        <label class="sv-label">Preferred Date</label>
+                        <input type="date" class="sv-input" id="svDate" required>
+                    </div>
+                    <div class="sv-group">
+                        <label class="sv-label">Preferred Time</label>
+                        <select class="sv-input" id="svTime" required>
+                            <option value="">Select time</option>
+                            <option>9:00 AM</option>
+                            <option>10:00 AM</option>
+                            <option>11:00 AM</option>
+                            <option>12:00 PM</option>
+                            <option>2:00 PM</option>
+                            <option>3:00 PM</option>
+                            <option>4:00 PM</option>
+                            <option>5:00 PM</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="sv-group">
+                    <label class="sv-label">Notes (optional)</label>
+                    <input type="text" class="sv-input" id="svNotes" placeholder="Any specific questions or requests?">
+                </div>
+                <button class="sv-submit" id="svSubmitBtn"><i class="fas fa-check-circle"></i> Confirm Visit</button>
+            </div>
+
+            <!-- Success View -->
+            <div class="sv-success" id="svSuccess">
+                <i class="fas fa-check-circle"></i>
+                <h3>Visit Scheduled!</h3>
+                <p id="svSuccessMsg">Your visit has been confirmed. The owner will contact you shortly.</p>
+                <button class="sv-submit" style="margin-top:20px;" onclick="document.getElementById('svOverlay').classList.remove('active');">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="pd-toast" id="pdToast"><i class="fas fa-check-circle"></i> <span id="pdToastMsg">Done!</span></div>
+
+    <script>
+    // ═══════════════════════════════════════════════════
+    // PROPERTY DATA (same as explore.html)
+    // ═══════════════════════════════════════════════════
+    const allProps=[
+      {id:0,title:'Agastyas PG',location:'Loni Kalbhor, Pune',meta:'Pathare Wasti · 1.5 km',price:'₹8,500',priceShort:'₹8.5k',deposit:'₹17,000',tier:'low',beds:'1 RK',baths:'Shared',sqft:'300 sqft',floor:'Ground Floor',furnished:'Fully Furnished',type:'PG',img:'assets/listings/dx.jpeg',fb:'assets/listings/new1.jpeg',tags:['PG','1 RK'],lat:18.4620,lng:73.9885,amenities:['wifi','meals'],desc1:'Agastyas PG offers affordable shared rooms with home-cooked meals and a friendly community atmosphere. Perfect for students on a budget.',desc2:'Located in Pathare Wasti, 1.5 km from Loni Kalbhor. Easy access to campus and local amenities.'},
+      {id:1,title:'Zolo Noble',location:'Loni Kalbhor, Pune',meta:'Malimala Rd · 0.8 km',price:'₹10,500',priceShort:'₹10.5k',deposit:'₹21,000',tier:'med',beds:'1 BHK',baths:'1 Bath',sqft:'500 sqft',floor:'1st Floor',furnished:'Fully Furnished',type:'PG',img:'assets/listings/img1.jpeg',fb:'assets/listings/new2.jpeg',tags:['PG','1 BHK'],lat:18.4512,lng:73.9910,amenities:['wifi','meals','laundry'],desc1:'Zolo Noble is a premium PG with attached bathrooms, laundry facilities, and high-speed Wi-Fi included.',desc2:'Just 800 meters from Loni Kalbhor on Malimala Road. Well-connected to public transport.'},
+      {id:2,title:'H25 Premium Stay Boys PG',location:'Loni Kalbhor, Pune',meta:'Chintamani Park · 1.2 km',price:'₹9,500',priceShort:'₹9.5k',deposit:'₹19,000',tier:'low',beds:'1 BHK',baths:'1 Bath',sqft:'450 sqft',floor:'2nd Floor',furnished:'Fully Furnished',type:'Hostel',img:'assets/listings/jhb.jpeg',fb:'assets/listings/new3.jpeg',tags:['Hostel','1 BHK'],lat:18.4550,lng:73.9850,amenities:['wifi','parking'],desc1:'H25 Premium Stay is a boys-only hostel with spacious rooms, parking facilities, and 24/7 security.',desc2:'Located near Chintamani Park, 1.2 km from campus. Peaceful residential area.'},
+      {id:3,title:'Shivsuman Boys Hostel PG',location:'Loni Kalbhor, Pune',meta:'Kadamwak Wasti · 2.5 km',price:'₹7,500',priceShort:'₹7.5k',deposit:'₹15,000',tier:'low',beds:'1 RK',baths:'Shared',sqft:'250 sqft',floor:'Ground Floor',furnished:'Basic',type:'Hostel',img:'assets/listings/img2.jpeg',fb:'assets/listings/new4.jpeg',tags:['Hostel','1 RK'],lat:18.4680,lng:73.9780,amenities:['parking'],desc1:'Shivsuman is a budget-friendly boys hostel with basic amenities. Great option for cost-conscious students.',desc2:'Located in Kadamwak Wasti, 2.5 km from campus. Affordable area with growing infrastructure.'},
+      {id:4,title:'Luxury Girls & Boys Hostel PG',location:'Loni Kalbhor, Pune',meta:'Loni Station · 0.5 km',price:'₹11,000',priceShort:'₹11k',deposit:'₹22,000',tier:'med',beds:'2 BHK',baths:'2 Bath',sqft:'800 sqft',floor:'1st Floor',furnished:'Fully Furnished',type:'Hostel',img:'assets/listings/img4.jpeg',fb:'assets/listings/new5.jpeg',tags:['Hostel','2 BHK'],lat:18.4480,lng:73.9950,amenities:['wifi','meals','ac'],desc1:'Premium hostel for both girls and boys with AC rooms, home-cooked meals, and modern interiors.',desc2:'Steps away from Loni Station, only 0.5 km from campus. The most convenient location for students.'},
+      {id:5,title:'Everest Hills PG',location:'Loni Kalbhor, Pune',meta:'Raywadi Road · 3.0 km',price:'₹8,500',priceShort:'₹8.5k',deposit:'₹17,000',tier:'low',beds:'1 RK',baths:'Shared',sqft:'280 sqft',floor:'1st Floor',furnished:'Furnished',type:'PG',img:'assets/listings/54.jpeg',fb:'assets/listings/new6.jpeg',tags:['PG','1 RK'],lat:18.4720,lng:73.9700,amenities:['wifi','parking'],desc1:'Everest Hills PG offers well-maintained shared rooms with Wi-Fi and two-wheeler parking.',desc2:'Located on Raywadi Road, 3 km from campus. Quiet surroundings ideal for focused study.'},
+      {id:6,title:'The ARK Boys Hostel',location:'Loni Kalbhor, Pune',meta:'Rahinj Nagar · 1.8 km',price:'₹9,500',priceShort:'₹9.5k',deposit:'₹19,000',tier:'low',beds:'1 BHK',baths:'1 Bath',sqft:'400 sqft',floor:'2nd Floor',furnished:'Furnished',type:'Hostel',img:'assets/listings/img5.jpeg',fb:'assets/listings/new7.jpeg',tags:['Hostel','1 BHK'],lat:18.4600,lng:73.9900,amenities:['wifi'],desc1:'The ARK is a boys-only hostel with attached bathrooms and reliable Wi-Fi for online classes.',desc2:'Rahinj Nagar location, 1.8 km from Loni Kalbhor. Safe neighborhood with good connectivity.'},
+      {id:7,title:'Shree Living Hostels PG',location:'Loni Kalbhor, Pune',meta:'MIT College Rd · 0.2 km',price:'₹9,500',priceShort:'₹9.5k',deposit:'₹19,000',tier:'low',beds:'1 BHK',baths:'1 Bath',sqft:'420 sqft',floor:'1st Floor',furnished:'Furnished',type:'PG',img:'assets/listings/img6.jpeg',fb:'assets/listings/new8.jpeg',tags:['PG','1 BHK'],lat:18.4530,lng:73.9870,amenities:['wifi','meals'],desc1:'Shree Living is the closest PG to MIT College with daily meals and high-speed internet included.',desc2:'Just 200 meters from MIT College Road. Walk to campus in under 3 minutes.'},
+      {id:8,title:'Chintamani Living PG',location:'Loni Kalbhor, Pune',meta:'MIT College Rd · 0.3 km',price:'₹10,500',priceShort:'₹10.5k',deposit:'₹21,000',tier:'med',beds:'1 BHK',baths:'1 Bath',sqft:'500 sqft',floor:'3rd Floor',furnished:'Fully Furnished',type:'PG',img:'assets/listings/img7.jpeg',fb:'assets/listings/new9.jpeg',tags:['PG','1 BHK'],lat:18.4520,lng:73.9860,amenities:['wifi','meals'],desc1:'Chintamani Living offers a co-living experience with modern amenities and a vibrant student community.',desc2:'300 meters from MIT College on the main road. Easy access to all local services.'},
+      {id:9,title:'Anuja 2 Boys Hostel',location:'Loni Kalbhor, Pune',meta:'Kadamwak Wasti · 2.0 km',price:'₹7,500',priceShort:'₹7.5k',deposit:'₹15,000',tier:'low',beds:'1 RK',baths:'Shared',sqft:'240 sqft',floor:'Ground Floor',furnished:'Basic',type:'Hostel',img:'assets/listings/img8.jpeg',fb:'assets/listings/new10.jpeg',tags:['Hostel','1 RK'],lat:18.4650,lng:73.9800,amenities:['parking'],desc1:'Anuja 2 is a budget boys hostel with basic furnishing and parking facilities.',desc2:'Located in Kadamwak Wasti, 2 km from campus. Most affordable option in the area.'},
+    ];
+
+    // ═══════════════════════════════════════════════════
+    // READ PROPERTY ID FROM URL & POPULATE PAGE
+    // ═══════════════════════════════════════════════════
+    const urlParams=new URLSearchParams(window.location.search);
+    const propId=parseInt(urlParams.get('id'))||0;
+    const prop=allProps.find(p=>p.id===propId)||allProps[0];
+
+    function populatePage(){
+      document.title=prop.title+' | LivEra';
+      document.getElementById('pdTitle').textContent=prop.title;
+      document.getElementById('pdLocation').textContent=prop.location;
+      document.getElementById('pdType').textContent=prop.type;
+      document.getElementById('pdPrice').textContent=prop.priceShort;
+      document.getElementById('pdDeposit').textContent='Deposit: '+prop.deposit;
+      document.getElementById('pdDesc1').textContent=prop.desc1;
+      document.getElementById('pdDesc2').textContent=prop.desc2;
+
+      // Quick info
+      document.getElementById('pdQuickInfo').innerHTML=`
+        <div class="pd-qi-item"><i class="fas fa-bed"></i><span>${prop.beds}</span></div>
+        <div class="pd-qi-item"><i class="fas fa-bath"></i><span>${prop.baths}</span></div>
+        <div class="pd-qi-item"><i class="fas fa-ruler-combined"></i><span>${prop.sqft}</span></div>
+        <div class="pd-qi-item"><i class="fas fa-couch"></i><span>${prop.furnished}</span></div>
+        <div class="pd-qi-item"><i class="fas fa-building"></i><span>${prop.floor}</span></div>
+      `;
+
+      // Images
+      const mainSrc=prop.img;
+      const fbSrc=prop.fb;
+      document.getElementById('mainImg').src=mainSrc;
+      document.getElementById('mainImg').onerror=function(){this.src=fbSrc;};
+      
+      // Setup dynamic gallery images from available assets
+      const s1 = prop.fb;
+      
+      document.getElementById('sideImg1').src = s1;
+
+      // Update global gallery array
+      galleryItems = [mainSrc, s1];
+      document.getElementById('fsTotalImages').textContent = galleryItems.length;
+
+      // Google Maps direction links
+      const gUrl=`https://www.google.com/maps/dir/?api=1&destination=${prop.lat},${prop.lng}`;
+      const mUrl=`https://www.google.com/maps?q=${prop.lat},${prop.lng}`;
+      document.getElementById('pdDirBtn').href=gUrl;
+      document.getElementById('pdDirBtn2').href=gUrl;
+      document.getElementById('pdMapsBtn').href=mUrl;
+
+      // Map iframe
+      document.getElementById('pdMapFrame').src=`https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d3784!2d${prop.lng}!3d${prop.lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin`;
+
+      // Schedule visit modal title
+      document.getElementById('svPropName').textContent='for '+prop.title;
+
+      // Similar listings
+      const others=allProps.filter(p=>p.id!==prop.id).slice(0,3);
+      document.getElementById('pdSimilar').innerHTML=others.map(p=>`
+        <a href="property-detail.html?id=${p.id}" style="text-decoration:none;display:block;background:var(--color-surface,#16161f);border:1px solid rgba(255,255,255,.06);border-radius:14px;overflow:hidden;transition:all .3s ease;">
+          <div style="position:relative;overflow:hidden;">
+            <img src="${p.img}" onerror="this.src='${p.fb}'" alt="${p.title}" loading="lazy" style="width:100%;height:180px;object-fit:cover;display:block;transition:transform .4s ease;">
+            <span style="position:absolute;top:10px;left:10px;background:rgba(201,168,76,.9);color:#0a0a0f;font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:20px;">${p.type}</span>
+          </div>
+          <div style="padding:16px;">
+            <div style="font-size:1.05rem;font-weight:800;color:#eaeaf0;margin-bottom:4px;">${p.priceShort} <span style="font-size:.78rem;font-weight:400;color:#5a5a72;">/month</span></div>
+            <div style="font-size:.88rem;font-weight:600;color:#eaeaf0;margin-bottom:6px;">${p.title}</div>
+            <div style="font-size:.78rem;color:#5a5a72;display:flex;align-items:center;gap:4px;margin-bottom:10px;"><i class="fas fa-location-dot" style="font-size:.68rem;"></i> ${p.location}</div>
+            <div style="display:flex;gap:12px;font-size:.75rem;color:#8b8ba0;">
+              <span><i class="fas fa-bed"></i> ${p.beds}</span>
+              <span><i class="fas fa-bath"></i> ${p.baths}</span>
+              <span><i class="fas fa-ruler-combined"></i> ${p.sqft}</span>
+            </div>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // SCHEDULE VISIT
+    // ═══════════════════════════════════════════════════
+    const svOverlay=document.getElementById('svOverlay');
+    const svClose=document.getElementById('svClose');
+    const svForm=document.getElementById('svForm');
+    const svSuccess=document.getElementById('svSuccess');
+
+    // Set min date to tomorrow
+    function initDatePicker(){
+      const d=new Date();
+      d.setDate(d.getDate()+1);
+      document.getElementById('svDate').min=d.toISOString().split('T')[0];
+      document.getElementById('svDate').value=d.toISOString().split('T')[0];
+    }
+
+    document.getElementById('scheduleVisitBtn').addEventListener('click',()=>{
+      svForm.style.display='block';
+      svSuccess.style.display='none';
+      svOverlay.classList.add('active');
+      document.body.style.overflow='hidden';
+      initDatePicker();
+    });
+
+    svClose.addEventListener('click',()=>{
+      svOverlay.classList.remove('active');
+      document.body.style.overflow='';
+    });
+
+    svOverlay.addEventListener('click',(e)=>{
+      if(e.target===svOverlay){svOverlay.classList.remove('active');document.body.style.overflow='';}
+    });
+
+    document.getElementById('svSubmitBtn').addEventListener('click',()=>{
+      const name=document.getElementById('svName').value.trim();
+      const phone=document.getElementById('svPhone').value.trim();
+      const date=document.getElementById('svDate').value;
+      const time=document.getElementById('svTime').value;
+      if(!name||!phone||!date||!time){showToast('⚠️ Please fill all required fields.');return;}
+
+      // Save to localStorage
+      const visits=JSON.parse(localStorage.getItem('visits')||'[]');
+      visits.push({propId:prop.id,propTitle:prop.title,propLocation:prop.location,name,phone,date,time,notes:document.getElementById('svNotes').value,status:'upcoming',createdAt:new Date().toISOString()});
+      localStorage.setItem('visits',JSON.stringify(visits));
+
+      // Show success
+      const dateObj=new Date(date+'T00:00:00');
+      const formatted=dateObj.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      document.getElementById('svSuccessMsg').textContent=`Your visit to ${prop.title} is confirmed for ${formatted} at ${time}. The owner will contact you at ${phone}.`;
+      svForm.style.display='none';
+      svSuccess.style.display='block';
+
+      // Send WhatsApp notification to property owner
+      const waMsg=encodeURIComponent(`🏠 *New Visit Request — LivEra*\n\n📍 Property: ${prop.title}\n📅 Date: ${formatted}\n⏰ Time: ${time}\n👤 Name: ${name}\n📞 Phone: ${phone}\n📝 Notes: ${document.getElementById('svNotes').value||'None'}`);
+      setTimeout(()=>{window.open(`https://wa.me/917037261848?text=${waMsg}`,'_blank');},800);
+    });
+
+    // ═══════════════════════════════════════════════════
+    // INQUIRY FORM
+    // ═══════════════════════════════════════════════════
+    document.getElementById('inquiryForm').addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const msg=document.getElementById('iqMsg').value.trim();
+      if(!msg) return;
+      const inqs=JSON.parse(localStorage.getItem('inquiries')||'[]');
+      inqs.push({propId:prop.id,msg,time:new Date().toISOString()});
+      localStorage.setItem('inquiries',JSON.stringify(inqs));
+      showToast('✅ Inquiry sent! The landlord will respond shortly.');
+      document.getElementById('inquiryForm').reset();
+    });
+
+    // ═══════════════════════════════════════════════════
+    // TOAST
+    // ═══════════════════════════════════════════════════
+    function showToast(msg){
+      const t=document.getElementById('pdToast');
+      document.getElementById('pdToastMsg').textContent=msg;
+      t.style.display='flex';
+      clearTimeout(t._tid);
+      t._tid=setTimeout(()=>{t.style.display='none';},3500);
+    }
+
+    // ═══════════════════════════════════════════════════
+    // GALLERY
+    // ═══════════════════════════════════════════════════
+    let galleryItems=['assets/images/property-exterior.png'];
+    const fsOverlay=document.getElementById('fsGalleryOverlay');
+    const fsImage=document.getElementById('fsGalleryImage');
+    let currentImageIndex=0;
+
+    function openGallery(i){currentImageIndex=i;updateGalleryImage();fsOverlay.classList.add('active');document.body.style.overflow='hidden';}
+    function closeGallery(){fsOverlay.classList.remove('active');document.body.style.overflow='';}
+    function nextImage(){currentImageIndex=(currentImageIndex+1)%galleryItems.length;updateGalleryImage();}
+    function prevImage(){currentImageIndex=(currentImageIndex-1+galleryItems.length)%galleryItems.length;updateGalleryImage();}
+    function updateGalleryImage(){fsImage.style.opacity='0';setTimeout(()=>{fsImage.src=galleryItems[currentImageIndex];document.getElementById('fsCurrentIndex').textContent=currentImageIndex+1;fsImage.style.opacity='1';},200);}
+
+    document.getElementById('galleryBtnMain')?.addEventListener('click',()=>openGallery(0));
+    document.getElementById('galleryBtn1')?.addEventListener('click',()=>openGallery(1));
+    document.getElementById('galleryBtn2')?.addEventListener('click',()=>openGallery(2));
+    document.getElementById('galleryBtn3')?.addEventListener('click',()=>openGallery(3));
+    document.getElementById('galleryBtn4')?.addEventListener('click',()=>openGallery(4));
+    document.getElementById('fsGalleryClose')?.addEventListener('click',closeGallery);
+    document.getElementById('fsNext')?.addEventListener('click',nextImage);
+    document.getElementById('fsPrev')?.addEventListener('click',prevImage);
+    document.addEventListener('keydown',(e)=>{if(!fsOverlay.classList.contains('active'))return;if(e.key==='Escape')closeGallery();else if(e.key==='ArrowRight')nextImage();else if(e.key==='ArrowLeft')prevImage();});
+    fsOverlay.addEventListener('click',(e)=>{if(e.target===fsOverlay)closeGallery();});
+
+    // ═══════════════════════════════════════════════════
+    // NAVBAR
+    // ═══════════════════════════════════════════════════
+    const navbar=document.getElementById('navbar');
+    window.addEventListener('scroll',()=>{
+      navbar.style.background=window.scrollY>50?'rgba(10,10,15,.95)':'rgba(10,10,15,.9)';
+      navbar.style.boxShadow=window.scrollY>50?'0 2px 20px rgba(0,0,0,.3)':'none';
+    });
+    const hamburger=document.getElementById('hamburger');
+    const navLinks=document.getElementById('navLinks');
+    if(hamburger) hamburger.addEventListener('click',()=>{navLinks.classList.toggle('active');hamburger.classList.toggle('active');});
+
+    // ═══════════════════════════════════════════════════
+    // BOOT
+    // ═══════════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded',populatePage);
+    // Also run immediately in case DOMContentLoaded already fired
+    if(document.readyState!=='loading') populatePage();
+    </script>
+
+</body>
+</html>
